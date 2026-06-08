@@ -1,8 +1,37 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Main Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="top-header">
+    <div class="logo">ROZETKA</div>
+
+    <input class="search" placeholder="Я шукаю..." />
+
+    <button class="cart-btn">🛒 Кошик</button>
+</div>
+
+<div class="layout">
+    <aside class="sidebar">
+        <h3>Категорії</h3>
+        <p>Ноутбуки</p>
+        <p>Смартфони</p>
+        <p>Побутова техніка</p>
+        <p>Одяг</p>
+    </aside>
+
+    <main class="products">
+        <div class="product-card">
+            <img src="/images/laptop.jpg" alt="Laptop" />
+            <h3>Lenovo IdeaPad</h3>
+            <p class="price">24 999 ₴</p>
+            <button>Купити</button>
+        </div>
+
+        <div class="product-card">
+            <img src="/images/phone.jpg" alt="Phone"/>
+            <h3>Смартфон Samsung Galaxy S26</h3>
+            <p class="price">16 499 ₴</p>
+            <button>Купити</button>
+        </div>
+    </main>
 </div>
