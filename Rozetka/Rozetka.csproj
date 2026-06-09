@@ -15,6 +15,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BLL\BLL.csproj" />
+<<<<<<< HEAD
+=======
+    <ProjectReference Include="..\DLL\DLL.csproj" />
+>>>>>>> 8df1b3535f0ee09addbd39b3340fbc31c8829e98
     <ProjectReference Include="..\Domain\Domain.csproj" />
   </ItemGroup>
 
