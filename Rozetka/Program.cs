@@ -2,7 +2,7 @@ using Domain;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Rozetka.Controllers;
-using 
+using Rozetka.Data;
 
 namespace Rozetka
 {
@@ -49,7 +49,7 @@ namespace Rozetka
                 var services = scope.ServiceProvider;
                 try
                 {
-                    await DbInitializer.SeedAsync(services);
+                    DbInitializer.SeedAsync(services).Wait();
                 }
                 catch (Exception ex)
                 {
