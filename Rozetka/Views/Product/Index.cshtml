@@ -1,0 +1,22 @@
+﻿@model List<Domain.Product>
+
+<div class="product-page">
+    <h1>Каталог товарів</h1>
+
+    <div class="product-grid">
+        @foreach (var product in Model)
+        {
+            <div class="product-card">
+                <img src="@product.ImageUrl" alt="@product.Name" />
+
+                <h3>@product.Name</h3>
+
+                <p>@product.Description</p>
+
+                <div class="price">@product.Price ₴</div>
+
+                <button>Купити</button>
+            </div>
+        }
+    </div>
+</div>
