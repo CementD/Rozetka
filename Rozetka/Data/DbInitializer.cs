@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.DependencyInjection; // ИСПРАВЛЕНО: добавлено для GetRequiredService
+using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
-using Domain; // Твой проект с моделями, где лежит User
+using Domain;
 
-namespace Rozetka.Data // ИСПРАВЛЕНО: теперь строго в слое бизнес-логики
+namespace Rozetka.Data 
 {
     public static class DbInitializer
     {
