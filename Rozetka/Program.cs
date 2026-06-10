@@ -1,4 +1,5 @@
 using Domain;
+using BLL.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Rozetka.Controllers;
@@ -23,6 +24,7 @@ namespace Rozetka
                 .AddDefaultTokenProviders();
 
             builder.Services.AddControllersWithViews();
+            builder.Services.AddScoped<IProductRepository, ProductRepository>();
 
             var app = builder.Build();
 
