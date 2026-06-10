@@ -1,33 +1,29 @@
 ﻿using Domain;
 using Microsoft.AspNetCore.Mvc;
+using BLL.Repositories;
+using System.Threading.Tasks;
 
 namespace Rozetka.Controllers
 {
     public class ProductController : Controller
     {
-        public IActionResult Index()
+        private readonly IProductRepository _repo;
+        public ProductController(IProductRepository repo)
         {
-            var products = new List<Product>
-            {
-                new Product
-                {
-                    Id = 1,
-                    Name = "Ноутбук Lenovo IdeaPad",
-                    Description = "15.6 Full HD / Ryzen 5 / 16GB RAM",
-                    Price = 24999,
-                    ImageUrl = "/images/laptop.jpg"
-                },
-                new Product
-                {
-                    Id = 2,
-                    Name = "Смартфон Samsung Galaxy",
-                    Description = "128GB / AMOLED / NFC",
-                    Price = 16499,
-                    ImageUrl = "/images/phone.jpg"
-                }
-            };
+            _repo = repo;
+        }
 
+        public async Task<IActionResult> Index()
+        {
+            var products = await _repo.GetAllAsync();
             return View(products);
+        }
+
+        public async Task<IActionResult> Details(int id)
+        {
+            var product = await _repo.GetByIdAsync(id);
+            if (product == null) return NotFound();
+            return View(product);
         }
     }
 }
