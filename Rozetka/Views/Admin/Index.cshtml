@@ -1,4 +1,6 @@
-﻿<div class="admin-layout">
+﻿@model IEnumerable<Domain.Product>
+
+<div class="admin-layout">
 
     <aside class="admin-sidebar">
 
@@ -19,26 +21,28 @@
 
         <div class="dashboard-header">
             <h1>Панель адміністратора</h1>
-            <button class="add-btn">
+
+            <a asp-action="AddProduct"
+               class="add-btn">
                 + Додати товар
-            </button>
+            </a>
         </div>
 
         <div class="stats">
 
             <div class="stat-card">
                 <h3>Товари</h3>
-                <p>124</p>
+                <p>@Model.Count()</p>
             </div>
 
             <div class="stat-card">
                 <h3>Замовлення</h3>
-                <p>52</p>
+                <p>0</p>
             </div>
 
             <div class="stat-card">
                 <h3>Користувачі</h3>
-                <p>302</p>
+                <p>0</p>
             </div>
 
         </div>
@@ -50,35 +54,59 @@
                 <thead>
                     <tr>
                         <th>ID</th>
+                        <th>Зображення</th>
                         <th>Назва</th>
                         <th>Ціна</th>
-                        <th>Категорія</th>
+                        <th>Опис</th>
                         <th>Дії</th>
                     </tr>
                 </thead>
 
                 <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>Lenovo IdeaPad</td>
-                        <td>24999 ₴</td>
-                        <td>Ноутбуки</td>
-                        <td>
-                            <button class="edit-btn">Редагувати</button>
-                            <button class="delete-btn">Видалити</button>
-                        </td>
-                    </tr>
 
-                    <tr>
-                        <td>2</td>
-                        <td>Samsung Galaxy</td>
-                        <td>16499 ₴</td>
-                        <td>Смартфони</td>
-                        <td>
-                            <button class="edit-btn">Редагувати</button>
-                            <button class="delete-btn">Видалити</button>
-                        </td>
-                    </tr>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.Id</td>
+
+                            <td>
+                                <img src="@item.ImageUrl"
+                                     class="product-img" />
+                            </td>
+
+                            <td>@item.Name</td>
+
+                            <td>@item.Price ₴</td>
+
+                            <td>@item.Description</td>
+
+                            <td class="actions">
+
+                                <a asp-action="EditProduct"
+                                   asp-route-id="@item.Id"
+                                   class="edit-btn">
+                                    Редагувати
+                                </a>
+
+                                <form asp-action="DeleteProduct"
+                                      method="post"
+                                      style="display:inline;">
+
+                                    <input type="hidden"
+                                           name="id"
+                                           value="@item.Id" />
+
+                                    <button type="submit"
+                                            class="delete-btn">
+                                        Видалити
+                                    </button>
+
+                                </form>
+
+                            </td>
+                        </tr>
+                    }
+
                 </tbody>
 
             </table>
