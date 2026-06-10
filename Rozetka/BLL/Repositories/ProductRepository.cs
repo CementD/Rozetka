@@ -44,5 +44,20 @@ namespace BLL.Repositories
             _db.Products.Update(product);
             await _db.SaveChangesAsync();
         }
+
+        public async Task<List<Order>> GetProductOrdersAsync(int productId)
+        {
+            return await _db.Orders
+                .Include(o => o.OrderItems)
+                .Where(o => o.OrderItems.Any(oi => oi.ProductId == productId))
+                .ToListAsync();
+        }
+
+        public Task<List<Product>> GetProductsByCategoryIdAsync(int categoryId)
+        {
+            return _db.Products
+                .Where(p => p.CategoryId == categoryId)
+                .ToListAsync();
+        }
     }
 }

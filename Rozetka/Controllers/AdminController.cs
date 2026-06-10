@@ -13,6 +13,8 @@ namespace Rozetka.Controllers
     {
         private readonly IProductRepository _productRepo;
         private readonly ICategoryRepository _categoryRepo;
+        private readonly IUserRepository _userRepo;
+        private readonly IOrderRepository _orderRepo;
 
         public AdminController(
             IProductRepository productRepo,
@@ -177,6 +179,37 @@ namespace Rozetka.Controllers
             return RedirectToAction(nameof(Index), new { tab = "products" });
         }
 
+        public async Task<IActionResult> ProductDetails(int id)
+        {
+            var product = await _productRepo.GetByIdAsync(id);
+
+            if (product == null)
+                return NotFound();
+
+            var orders = await _productRepo.GetProductOrdersAsync(id);
+
+            var model = new ProductDetailsVM
+            {
+                Id = product.Id,
+                Name = product.Name,
+                Description = product.Description,
+                Price = product.Price,
+                ImageUrl = product.ImageUrl,
+                Specifications = product.Specifications,
+                CategoryName = product.Category?.Name,
+
+                OrdersCount = orders.Count,
+                Orders = orders.Select(o => new OrderMiniVM
+                {
+                    Id = o.Id,
+                    OrderDate = o.OrderDate,
+                    Status = o.Status
+                }).ToList()
+            };
+
+            return View(model);
+        }
+
 
         public IActionResult AddCategory()
         {
@@ -249,6 +282,31 @@ namespace Rozetka.Controllers
 
             return RedirectToAction(nameof(Index), new { tab = "categories" });
         }
+        public async Task<IActionResult> CategoryDetails(int id)
+        {
+            var category = await _categoryRepo.GetByIdAsync(id);
+
+            if (category == null)
+                return NotFound();
+
+            var products = await _productRepo.GetProductsByCategoryIdAsync(id);
+
+            var model = new CategoryDetailsVM
+            {
+                Id = category.Id,
+                Name = category.Name,
+
+                Products = products.Select(p => new ProductVM
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    Price = p.Price,
+                    ImageUrl = p.ImageUrl
+                }).ToList()
+            };
+
+            return View(model);
+        }
 
         public IActionResult WhoAmI()
         {
@@ -256,6 +314,56 @@ namespace Rozetka.Controllers
                 $"User: {User.Identity?.Name}\n" +
                 $"Authenticated: {User.Identity?.IsAuthenticated}\n" +
                 $"IsAdmin: {User.IsInRole("Admin")}");
+        }
+
+        public async Task<IActionResult> OrderDetails(int id)
+        {
+            var order = _orderRepo.GetByIdWithDetailsAsync(id).Result;
+
+            if (order == null)
+                return NotFound();
+
+            var model = new OrderDetailsVM
+            {
+                Id = order.Id,
+                OrderDate = order.OrderDate,
+                Status = order.Status,
+                UserId = order.UserId,
+                UserName = order.User.UserName,
+
+                Items = order.OrderItems.Select(i => new OrderItemVM
+                {
+                    ProductName = i.Product.Name,
+                    Quantity = i.Quantity,
+                    UnitPrice = i.UnitPrice
+                }).ToList()
+            };
+
+            return View(model);
+        }
+
+        public async Task<IActionResult> UserDetails(string id)
+        {
+            var user = await _userRepo.GetByIdWithOrdersAsync(id);
+
+            if (user == null)
+                return NotFound();
+
+            var model = new UserDetailsVM
+            {
+                Id = user.Id,
+                Email = user.Email,
+                FullName = $"{user.FirstName} {user.LastName}",
+
+                Orders = user.Orders.Select(o => new OrderMiniVM
+                {
+                    Id = o.Id,
+                    OrderDate = o.OrderDate,
+                    Status = o.Status
+                }).ToList()
+            };
+
+            return View(model);
         }
     }
 }
