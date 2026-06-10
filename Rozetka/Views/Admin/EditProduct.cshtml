@@ -1,12 +1,14 @@
-﻿@model Rozetka.ViewModels.Admin.ProductCreateVM
+﻿@model Rozetka.ViewModels.Admin.ProductEditVM
 
 <div class="form-page">
     <div class="form-card">
 
-        <h2>Додати товар</h2>
+        <h2>Редагувати товар</h2>
 
-        <form asp-action="AddProduct" method="post">
+        <form asp-action="EditProduct" method="post">
             @Html.AntiForgeryToken()
+
+            <input type="hidden" asp-for="Id" />
 
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
@@ -37,7 +39,6 @@
             <div class="form-group">
                 <label asp-for="Specifications"></label>
                 <textarea asp-for="Specifications" class="form-input"></textarea>
-                <span asp-validation-for="Specifications" class="text-danger"></span>
             </div>
 
             <div class="form-group">
@@ -46,7 +47,6 @@
                 <select asp-for="CategoryId"
                         asp-items="Model.Categories"
                         class="form-input">
-                    <option value="">-- Виберіть категорію --</option>
                 </select>
 
                 <span asp-validation-for="CategoryId" class="text-danger"></span>
@@ -56,15 +56,11 @@
                 Зберегти
             </button>
 
-            <a asp-action="Index" class="cancel-btn">
-                Назад
-            </a>
         </form>
 
     </div>
 </div>
 
-@section Scripts
-{
+@section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }
