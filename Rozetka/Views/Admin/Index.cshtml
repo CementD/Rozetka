@@ -1,161 +1,216 @@
 ﻿@model Rozetka.ViewModels.Admin.AdminIndexVM
-
 @{
+    ViewData["Title"] = "Адмін панель";
     string currentTab = Model.CurrentTab;
 }
 
 <div class="admin-layout">
 
     <aside class="admin-sidebar">
-
         <div class="admin-logo">
-            ROZETKA ADMIN
+            <i class="fa-solid fa-store"></i> ROZETKA
         </div>
-
-        <ul>
-            <li class="@(currentTab == "products" ? "active-tab" : "")">
-                <a asp-action="Index" asp-route-tab="products">📦 Товари</a>
-            </li>
-
-            <li class="@(currentTab == "categories" ? "active-tab" : "")">
-                <a asp-action="Index" asp-route-tab="categories">📂 Категорії</a>
-            </li>
-
-            <li>🛒 Замовлення</li>
-            <li>👤 Користувачі</li>
-            <li>📊 Статистика</li>
-        </ul>
-
+        <nav class="admin-nav">
+            <a asp-action="Index" asp-route-tab="products"
+               class="admin-nav-link @(currentTab == "products" ? "active" : "")">
+                <i class="fa-solid fa-box"></i> Товари
+            </a>
+            <a asp-action="Index" asp-route-tab="categories"
+               class="admin-nav-link @(currentTab == "categories" ? "active" : "")">
+                <i class="fa-solid fa-list"></i> Категорії
+            </a>
+            <a href="#" class="admin-nav-link">
+                <i class="fa-solid fa-cart-shopping"></i> Замовлення
+            </a>
+            <a href="#" class="admin-nav-link">
+                <i class="fa-solid fa-users"></i> Користувачі
+            </a>
+        </nav>
+        <div class="admin-sidebar-footer">
+            <a asp-controller="Home" asp-action="Index" class="admin-nav-link">
+                <i class="fa-solid fa-arrow-left"></i> На сайт
+            </a>
+        </div>
     </aside>
 
     <main class="admin-content">
 
-        <div class="dashboard-header">
-
+        <div class="admin-topbar">
+            <div>
+                <h1 class="admin-page-title">
+                    @(currentTab == "products" ? "Товари" : "Категорії")
+                </h1>
+                <p class="admin-page-sub">Управління магазином</p>
+            </div>
             @if (currentTab == "products")
             {
-                <h1>Панель адміністратора: Товари</h1>
-                <a asp-action="AddProduct" class="add-btn">+ Додати товар</a>
+                <a asp-action="AddProduct" class="add-btn">
+                    <i class="fa-solid fa-plus"></i> Додати товар
+                </a>
             }
-            else if (currentTab == "categories")
+            else
             {
-                <h1>Панель адміністратора: Категорії</h1>
-                <a asp-action="AddCategory" class="add-btn">+ Додати категорію</a>
+                <a asp-action="AddCategory" class="add-btn">
+                    <i class="fa-solid fa-plus"></i> Додати категорію
+                </a>
             }
-
         </div>
 
         <div class="stats">
-
             <div class="stat-card">
-                <h3>Товари</h3>
-                <p>@Model.ProductsCount</p>
+                <div class="stat-icon stat-icon-green"><i class="fa-solid fa-box"></i></div>
+                <div>
+                    <p class="stat-value">@Model.ProductsCount</p>
+                    <span class="stat-label">Товари</span>
+                </div>
             </div>
-
             <div class="stat-card">
-                <h3>Категорії</h3>
-                <p>@Model.CategoriesCount</p>
+                <div class="stat-icon stat-icon-blue"><i class="fa-solid fa-list"></i></div>
+                <div>
+                    <p class="stat-value">@Model.CategoriesCount</p>
+                    <span class="stat-label">Категорії</span>
+                </div>
             </div>
-
             <div class="stat-card">
-                <h3>Замовлення</h3>
-                <p>0</p>
+                <div class="stat-icon stat-icon-purple"><i class="fa-solid fa-cart-shopping"></i></div>
+                <div>
+                    <p class="stat-value">0</p>
+                    <span class="stat-label">Замовлення</span>
+                </div>
             </div>
-
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-orange"><i class="fa-solid fa-users"></i></div>
+                <div>
+                    <p class="stat-value">0</p>
+                    <span class="stat-label">Користувачі</span>
+                </div>
+            </div>
         </div>
 
         <div class="table-wrapper">
 
             @if (currentTab == "products")
             {
-                <table class="admin-table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Зображення</th>
-                            <th>Назва</th>
-                            <th>Ціна</th>
-                            <th>Опис</th>
-                            <th>Категорія</th>
-                            <th>Дії</th>
-                        </tr>
-                    </thead>
+                <div class="table-header">
+                    <h2 class="table-title">Список товарів</h2>
+                </div>
 
-                    <tbody>
-                        @foreach (var item in Model.Products)
-                        {
+                @if (!Model.Products.Any())
+                {
+                    <div class="admin-empty">
+                        <i class="fa-solid fa-box-open"></i>
+                        <p>Товарів ще немає. <a asp-action="AddProduct">Додати перший</a></p>
+                    </div>
+                }
+                else
+                {
+                    <table class="admin-table">
+                        <thead>
                             <tr>
-                                <td>@item.Id</td>
-
-                                <td>
-                                    <img src="@item.ImageUrl" class="product-img" />
-                                </td>
-
-                                <td>@item.Name</td>
-                                <td>@item.Price ₴</td>
-                                <td>@item.Description</td>
-                                <td>@item.CategoryName</td>
-
-                                <td class="actions">
-                                    <a asp-action="EditProduct"
-                                       asp-route-id="@item.Id"
-                                       class="edit-btn">
-                                        Редагувати
-                                    </a>
-
-                                    <form asp-action="DeleteProduct" method="post" style="display:inline;">
-                                        <input type="hidden" name="id" value="@item.Id" />
-                                        <button type="submit" class="delete-btn">
-                                            Видалити
-                                        </button>
-                                    </form>
-                                </td>
+                                <th>ID</th>
+                                <th>Фото</th>
+                                <th>Назва</th>
+                                <th>Категорія</th>
+                                <th>Ціна</th>
+                                <th>Дії</th>
                             </tr>
-                        }
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Products)
+                            {
+                                <tr>
+                                    <td class="td-id">#@item.Id</td>
+                                    <td>
+                                        <img src="@(string.IsNullOrEmpty(item.ImageUrl) ? "/images/phone.jpg" : item.ImageUrl)"
+                                             class="product-img" onerror="this.src='/images/phone.jpg'" />
+                                    </td>
+                                    <td>
+                                        <span class="td-name">@item.Name</span>
+                                        @if (!string.IsNullOrEmpty(item.Description))
+                                        {
+                                            <span class="td-desc">@(item.Description.Length > 60 ? item.Description[..60] + "…" : item.Description)</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(item.CategoryName))
+                                        {
+                                            <span class="td-badge">@item.CategoryName</span>
+                                        }
+                                    </td>
+                                    <td class="td-price">@item.Price.ToString("N0") ₴</td>
+                                    <td>
+                                        <div class="actions">
+                                            <a asp-action="EditProduct" asp-route-id="@item.Id"
+                                               class="edit-btn" title="Редагувати">
+                                                <i class="fa-solid fa-pen"></i>
+                                            </a>
+                                            <form asp-action="DeleteProduct" method="post" style="display:inline"
+                                                  onsubmit="return confirm('Видалити «@item.Name»?')">
+                                                <input type="hidden" name="id" value="@item.Id" />
+                                                <button type="submit" class="delete-btn" title="Видалити">
+                                                    <i class="fa-solid fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
             }
-
             else if (currentTab == "categories")
             {
-                <table class="admin-table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Назва категорії</th>
-                            <th>Дії</th>
-                        </tr>
-                    </thead>
+                <div class="table-header">
+                    <h2 class="table-title">Список категорій</h2>
+                </div>
 
-                    <tbody>
-                        @foreach (var item in Model.Categories)
-                        {
+                @if (!Model.Categories.Any())
+                {
+                    <div class="admin-empty">
+                        <i class="fa-solid fa-list"></i>
+                        <p>Категорій ще немає. <a asp-action="AddCategory">Додати першу</a></p>
+                    </div>
+                }
+                else
+                {
+                    <table class="admin-table">
+                        <thead>
                             <tr>
-                                <td>@item.Id</td>
-                                <td>@item.Name</td>
-
-                                <td class="actions">
-                                    <a asp-action="EditCategory"
-                                       asp-route-id="@item.Id"
-                                       class="edit-btn">
-                                        Редагувати
-                                    </a>
-
-                                    <form asp-action="DeleteCategory" method="post" style="display:inline;">
-                                        <input type="hidden" name="id" value="@item.Id" />
-                                        <button type="submit" class="delete-btn">
-                                            Видалити
-                                        </button>
-                                    </form>
-                                </td>
+                                <th>ID</th>
+                                <th>Назва</th>
+                                <th>Дії</th>
                             </tr>
-                        }
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @foreach (var cat in Model.Categories)
+                            {
+                                <tr>
+                                    <td class="td-id">#@cat.Id</td>
+                                    <td><span class="td-name">@cat.Name</span></td>
+                                    <td>
+                                        <div class="actions">
+                                            <a asp-action="EditCategory" asp-route-id="@cat.Id"
+                                               class="edit-btn" title="Редагувати">
+                                                <i class="fa-solid fa-pen"></i>
+                                            </a>
+                                            <form asp-action="DeleteCategory" method="post" style="display:inline"
+                                                  onsubmit="return confirm('Видалити «@cat.Name»?')">
+                                                <input type="hidden" name="id" value="@cat.Id" />
+                                                <button type="submit" class="delete-btn" title="Видалити">
+                                                    <i class="fa-solid fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
             }
 
         </div>
 
     </main>
-
 </div>
