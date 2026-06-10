@@ -7,60 +7,77 @@
 <section class="main-layout">
     <aside class="category-panel">
         <h3>Категорії</h3>
-        <a asp-controller="Product" asp-action="Index" asp-route-category="Ноутбуки">💻 Ноутбуки</a>
-        <a asp-controller="Product" asp-action="Index" asp-route-category="Смартфони">📱 Смартфони</a>
-        <a asp-controller="Product" asp-action="Index" asp-route-category="Телевізори">📺 Телевізори</a>
-        <a asp-controller="Product" asp-action="Index" asp-route-category="Навушники">🎧 Навушники</a>
-        <a asp-controller="Product" asp-action="Index" asp-route-category="Побутова техніка">🏠 Побутова техніка</a>
+        <a asp-controller="Product" asp-action="Index" asp-route-category="Ноутбуки">
+            <i class="fa-solid fa-laptop"></i> Ноутбуки
+        </a>
+        <a asp-controller="Product" asp-action="Index" asp-route-category="Смартфони">
+            <i class="fa-solid fa-mobile-screen-button"></i> Смартфони
+        </a>
+        <a asp-controller="Product" asp-action="Index" asp-route-category="Телевізори">
+            <i class="fa-solid fa-tv"></i> Телевізори
+        </a>
+        <a asp-controller="Product" asp-action="Index" asp-route-category="Навушники">
+            <i class="fa-solid fa-headphones"></i> Навушники
+        </a>
+        <a asp-controller="Product" asp-action="Index" asp-route-category="Побутова техніка">
+            <i class="fa-solid fa-blender"></i> Побутова техніка
+        </a>
+        <a asp-controller="Product" asp-action="Index">
+            <i class="fa-solid fa-grip"></i> Всі категорії
+        </a>
     </aside>
 
     <main class="home-content">
         <div class="banner">
             <div class="banner-content">
-                <div class="banner-badge">🔥 Гарячі пропозиції</div>
+                <div class="banner-badge"><i class="fa-solid fa-fire"></i> Гарячі пропозиції</div>
                 <h1>Великий розпродаж техніки</h1>
                 <p>Знижки до 40% на популярні товари</p>
-                <a asp-controller="Product" asp-action="Index" class="banner-btn">Перейти до каталогу →</a>
+                <a asp-controller="Product" asp-action="Index" class="banner-btn">
+                    Перейти до каталогу <i class="fa-solid fa-arrow-right"></i>
+                </a>
             </div>
         </div>
 
         <div class="section-header">
             <h2>Популярні товари</h2>
-            <a asp-controller="Product" asp-action="Index" class="see-all-link">Дивитись всі →</a>
+            <a asp-controller="Product" asp-action="Index" class="see-all-link">
+                Дивитись всі <i class="fa-solid fa-chevron-right"></i>
+            </a>
         </div>
 
         <div class="products-grid">
             <div class="home-product-card">
-                <span class="badge badge-top">Топ продажів</span>
+                <span class="badge badge-top"><i class="fa-solid fa-trophy"></i> Топ продажів</span>
                 <div class="card-img-wrap">
                     <img src="/images/laptop.jpg" alt="Laptop" />
                 </div>
                 <h3>Lenovo IdeaPad</h3>
                 <p class="desc">15.6 Full HD / Ryzen 5 / 16GB RAM</p>
                 <p class="price">24 999 <span class="currency">₴</span></p>
-                <button class="buy-btn">Купити</button>
+                <button class="buy-btn"><i class="fa-solid fa-cart-plus"></i> Купити</button>
             </div>
 
             <div class="home-product-card">
-                <span class="badge badge-new">Новинка</span>
+                <span class="badge badge-new"><i class="fa-solid fa-star"></i> Новинка</span>
                 <div class="card-img-wrap">
                     <img src="/images/phone.jpg" alt="Phone" />
                 </div>
                 <h3>Samsung Galaxy S26</h3>
                 <p class="desc">AMOLED / 128GB / NFC</p>
                 <p class="price">16 499 <span class="currency">₴</span></p>
-                <button class="buy-btn">Купити</button>
+                <button class="buy-btn"><i class="fa-solid fa-cart-plus"></i> Купити</button>
             </div>
 
             <div class="home-product-card">
-                <span class="badge badge-sale">-20%</span>
+                <span class="badge badge-sale"><i class="fa-solid fa-tag"></i> -20%</span>
                 <div class="card-img-wrap">
                     <img src="/images/laptop.jpg" alt="Laptop" />
                 </div>
                 <h3>ASUS VivoBook 15</h3>
                 <p class="desc">15.6 FHD / Intel i5 / 8GB RAM</p>
                 <p class="price">19 499 <span class="currency">₴</span></p>
-                <button class="buy-btn">Купити</button>
+                <button class="buy-btn"><i class="fa-solid fa-cart-plus"></i> Купити</button>
             </div>
 
             <div class="home-product-card">
@@ -70,25 +87,34 @@
                 <h3>iPhone 16</h3>
                 <p class="desc">6.1" OLED / 256GB / 5G</p>
                 <p class="price">42 999 <span class="currency">₴</span></p>
-                <button class="buy-btn">Купити</button>
+                <button class="buy-btn"><i class="fa-solid fa-cart-plus"></i> Купити</button>
             </div>
         </div>
 
         <div class="promo-grid">
             <div class="promo-card promo-blue">
+                <i class="fa-solid fa-mobile-screen-button promo-icon"></i>
                 <h3>Смартфони</h3>
                 <p>Найкращі пропозиції</p>
-                <a asp-controller="Product" asp-action="Index" asp-route-category="Смартфони">Обрати →</a>
+                <a asp-controller="Product" asp-action="Index" asp-route-category="Смартфони">
+                    Обрати <i class="fa-solid fa-arrow-right"></i>
+                </a>
             </div>
             <div class="promo-card promo-dark">
+                <i class="fa-solid fa-laptop promo-icon"></i>
                 <h3>Ноутбуки</h3>
                 <p>Для роботи і навчання</p>
-                <a asp-controller="Product" asp-action="Index" asp-route-category="Ноутбуки">Обрати →</a>
+                <a asp-controller="Product" asp-action="Index" asp-route-category="Ноутбуки">
+                    Обрати <i class="fa-solid fa-arrow-right"></i>
+                </a>
             </div>
             <div class="promo-card promo-green">
+                <i class="fa-solid fa-plug promo-icon"></i>
                 <h3>Аксесуари</h3>
                 <p>Завжди в наявності</p>
-                <a asp-controller="Product" asp-action="Index">Обрати →</a>
+                <a asp-controller="Product" asp-action="Index">
+                    Обрати <i class="fa-solid fa-arrow-right"></i>
+                </a>
             </div>
         </div>
     </main>
