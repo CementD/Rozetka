@@ -1,4 +1,8 @@
-﻿@model IEnumerable<Domain.Product>
+﻿@model Rozetka.ViewModels.Admin.AdminIndexVM
+
+@{
+    string currentTab = Model.CurrentTab;
+}
 
 <div class="admin-layout">
 
@@ -9,7 +13,14 @@
         </div>
 
         <ul>
-            <li>📦 Товари</li>
+            <li class="@(currentTab == "products" ? "active-tab" : "")">
+                <a asp-action="Index" asp-route-tab="products">📦 Товари</a>
+            </li>
+
+            <li class="@(currentTab == "categories" ? "active-tab" : "")">
+                <a asp-action="Index" asp-route-tab="categories">📂 Категорії</a>
+            </li>
+
             <li>🛒 Замовлення</li>
             <li>👤 Користувачі</li>
             <li>📊 Статистика</li>
@@ -20,19 +31,30 @@
     <main class="admin-content">
 
         <div class="dashboard-header">
-            <h1>Панель адміністратора</h1>
 
-            <a asp-action="AddProduct"
-               class="add-btn">
-                + Додати товар
-            </a>
+            @if (currentTab == "products")
+            {
+                <h1>Панель адміністратора: Товари</h1>
+                <a asp-action="AddProduct" class="add-btn">+ Додати товар</a>
+            }
+            else if (currentTab == "categories")
+            {
+                <h1>Панель адміністратора: Категорії</h1>
+                <a asp-action="AddCategory" class="add-btn">+ Додати категорію</a>
+            }
+
         </div>
 
         <div class="stats">
 
             <div class="stat-card">
                 <h3>Товари</h3>
-                <p>@Model.Count()</p>
+                <p>@Model.ProductsCount</p>
+            </div>
+
+            <div class="stat-card">
+                <h3>Категорії</h3>
+                <p>@Model.CategoriesCount</p>
             </div>
 
             <div class="stat-card">
@@ -40,76 +62,97 @@
                 <p>0</p>
             </div>
 
-            <div class="stat-card">
-                <h3>Користувачі</h3>
-                <p>0</p>
-            </div>
-
         </div>
 
         <div class="table-wrapper">
 
-            <table class="admin-table">
-
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Зображення</th>
-                        <th>Назва</th>
-                        <th>Ціна</th>
-                        <th>Опис</th>
-                        <th>Дії</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-
-                    @foreach (var item in Model)
-                    {
+            @if (currentTab == "products")
+            {
+                <table class="admin-table">
+                    <thead>
                         <tr>
-                            <td>@item.Id</td>
-
-                            <td>
-                                <img src="@item.ImageUrl"
-                                     class="product-img" />
-                            </td>
-
-                            <td>@item.Name</td>
-
-                            <td>@item.Price ₴</td>
-
-                            <td>@item.Description</td>
-
-                            <td class="actions">
-
-                                <a asp-action="EditProduct"
-                                   asp-route-id="@item.Id"
-                                   class="edit-btn">
-                                    Редагувати
-                                </a>
-
-                                <form asp-action="DeleteProduct"
-                                      method="post"
-                                      style="display:inline;">
-
-                                    <input type="hidden"
-                                           name="id"
-                                           value="@item.Id" />
-
-                                    <button type="submit"
-                                            class="delete-btn">
-                                        Видалити
-                                    </button>
-
-                                </form>
-
-                            </td>
+                            <th>ID</th>
+                            <th>Зображення</th>
+                            <th>Назва</th>
+                            <th>Ціна</th>
+                            <th>Опис</th>
+                            <th>Категорія</th>
+                            <th>Дії</th>
                         </tr>
-                    }
+                    </thead>
 
-                </tbody>
+                    <tbody>
+                        @foreach (var item in Model.Products)
+                        {
+                            <tr>
+                                <td>@item.Id</td>
 
-            </table>
+                                <td>
+                                    <img src="@item.ImageUrl" class="product-img" />
+                                </td>
+
+                                <td>@item.Name</td>
+                                <td>@item.Price ₴</td>
+                                <td>@item.Description</td>
+                                <td>@item.CategoryName</td>
+
+                                <td class="actions">
+                                    <a asp-action="EditProduct"
+                                       asp-route-id="@item.Id"
+                                       class="edit-btn">
+                                        Редагувати
+                                    </a>
+
+                                    <form asp-action="DeleteProduct" method="post" style="display:inline;">
+                                        <input type="hidden" name="id" value="@item.Id" />
+                                        <button type="submit" class="delete-btn">
+                                            Видалити
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+
+            else if (currentTab == "categories")
+            {
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Назва категорії</th>
+                            <th>Дії</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var item in Model.Categories)
+                        {
+                            <tr>
+                                <td>@item.Id</td>
+                                <td>@item.Name</td>
+
+                                <td class="actions">
+                                    <a asp-action="EditCategory"
+                                       asp-route-id="@item.Id"
+                                       class="edit-btn">
+                                        Редагувати
+                                    </a>
+
+                                    <form asp-action="DeleteCategory" method="post" style="display:inline;">
+                                        <input type="hidden" name="id" value="@item.Id" />
+                                        <button type="submit" class="delete-btn">
+                                            Видалити
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
 
         </div>
 
