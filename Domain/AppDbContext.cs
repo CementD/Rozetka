@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Domain
 {
-    internal class AppDbContext : IdentityDbContext
+    public class AppDbContext : IdentityDbContext
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
@@ -35,6 +35,9 @@ namespace Domain
                 .HasForeignKey(oi => oi.ProductId);
             builder.Entity<Product>()
                 .Property(p => p.Price)
+                .HasColumnType("decimal(18,2)");
+            builder.Entity<OrderItem>()
+                .Property(oi => oi.UnitPrice)
                 .HasColumnType("decimal(18,2)");
         }
     }
