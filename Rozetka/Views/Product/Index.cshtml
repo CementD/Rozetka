@@ -1,22 +1,131 @@
 ﻿@model List<Domain.Product>
 
-<div class="product-page">
-    <h1>Каталог товарів</h1>
+@{
+    ViewData["Title"] = "Каталог товарів";
+    var categories = ViewData["Categories"] as List<string> ?? new List<string>();
+    var currentCategory = ViewData["Category"] as string;
+    var currentSearch = ViewData["Search"] as string;
+    var currentSort = ViewData["Sort"] as string;
+}
 
-    <div class="product-grid">
-        @foreach (var product in Model)
-        {
-            <div class="product-card">
-                <img src="@product.ImageUrl" alt="@product.Name" />
+@await Html.PartialAsync("_Header")
 
-                <h3>@product.Name</h3>
+    <div class="catalog-layout">
 
-                <p>@product.Description</p>
+        <aside class="catalog-sidebar">
 
-                <div class="price">@product.Price ₴</div>
-
-                <button>Купити</button>
+            <div class="filter-section">
+                <h4>Категорії</h4>
+                <a asp-controller="Product" asp-action="Index"
+                   asp-route-search="@currentSearch"
+                   asp-route-sort="@currentSort"
+                   class="filter-link @(string.IsNullOrEmpty(currentCategory) ? "active" : "")">
+                    Всі товари
+                </a>
+                @foreach (var cat in categories)
+                {
+                    <a asp-controller="Product" asp-action="Index"
+                       asp-route-search="@currentSearch"
+                       asp-route-category="@cat"
+                       asp-route-sort="@currentSort"
+                       class="filter-link @(currentCategory == cat ? "active" : "")">
+                        @cat
+                    </a>
+                }
             </div>
-        }
+
+            <div class="filter-section">
+                <h4>Сортування</h4>
+                <a asp-controller="Product" asp-action="Index"
+                   asp-route-search="@currentSearch"
+                   asp-route-category="@currentCategory"
+                   asp-route-sort=""
+                   class="filter-link @(string.IsNullOrEmpty(currentSort) ? "active" : "")">
+                    За замовчуванням
+                </a>
+                <a asp-controller="Product" asp-action="Index"
+                   asp-route-search="@currentSearch"
+                   asp-route-category="@currentCategory"
+                   asp-route-sort="price_asc"
+                   class="filter-link @(currentSort == "price_asc" ? "active" : "")">
+                    Ціна: від дешевих
+                </a>
+                <a asp-controller="Product" asp-action="Index"
+                   asp-route-search="@currentSearch"
+                   asp-route-category="@currentCategory"
+                   asp-route-sort="price_desc"
+                   class="filter-link @(currentSort == "price_desc" ? "active" : "")">
+                    Ціна: від дорогих
+                </a>
+                <a asp-controller="Product" asp-action="Index"
+                   asp-route-search="@currentSearch"
+                   asp-route-category="@currentCategory"
+                   asp-route-sort="name"
+                   class="filter-link @(currentSort == "name" ? "active" : "")">
+                    За назвою А–Я
+                </a>
+            </div>
+
+        </aside>
+
+        <main class="catalog-main">
+
+            <div class="catalog-top-bar">
+                <div class="catalog-title-block">
+                    <h1>@(string.IsNullOrEmpty(currentCategory) ? "Всі товари" : currentCategory)</h1>
+                    @if (!string.IsNullOrEmpty(currentSearch))
+                    {
+                        <span class="search-hint">Результати пошуку: «@currentSearch»</span>
+                    }
+                    <span class="product-count">@Model.Count товарів</span>
+                </div>
+
+                @if (!string.IsNullOrEmpty(currentCategory) || !string.IsNullOrEmpty(currentSearch))
+                {
+                    <a asp-controller="Product" asp-action="Index" class="reset-filters">✕ Скинути фільтри</a>
+                }
+            </div>
+
+            @if (Model.Count == 0)
+            {
+                <div class="empty-state">
+                    <div class="empty-icon">🔍</div>
+                    <h2>Товарів не знайдено</h2>
+                    <p>Спробуйте змінити фільтри або пошуковий запит</p>
+                    <a asp-controller="Product" asp-action="Index" class="buy-btn" style="display:inline-block;padding:14px 28px;">Показати всі товари</a>
+                </div>
+            }
+            else
+            {
+                <div class="product-grid">
+                    @foreach (var product in Model)
+                    {
+                        <div class="product-card">
+                            @if (product.Category != null)
+                            {
+                                <span class="card-category">@product.Category.Name</span>
+                            }
+                            <div class="card-img-wrap">
+                                <img src="@(string.IsNullOrEmpty(product.ImageUrl) ? "/images/placeholder.jpg" : product.ImageUrl)"
+                                     alt="@product.Name"
+                                     onerror="this.src='/images/phone.jpg'" />
+                            </div>
+                            <div class="card-body">
+                                <h3>@product.Name</h3>
+                                @if (!string.IsNullOrEmpty(product.Description))
+                                {
+                                    <p class="desc">@product.Description</p>
+                                }
+                                <div class="price">@product.Price.ToString("N0") <span class="currency">₴</span></div>
+                                <div class="card-actions">
+                                    <button class="buy-btn">Купити</button>
+                                    <a asp-controller="Product" asp-action="Details" asp-route-id="@product.Id" class="details-btn">Детальніше</a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+
+        </main>
     </div>
-</div>

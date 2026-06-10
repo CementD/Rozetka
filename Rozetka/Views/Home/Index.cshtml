@@ -2,61 +2,93 @@
     ViewData["Title"] = "ROZETKA";
 }
 
-<header class="hero-header">
-    <div class="hero-logo">ROZETKA</div>
-
-    <button class="catalog-btn">☰ Каталог</button>
-
-    <div class="hero-search">
-        <input type="text" placeholder="Я шукаю..." />
-        <button>Знайти</button>
-    </div>
-
-    <div class="hero-icons">
-        <a asp-controller="Account" asp-action="Login">👤</a>
-        <a href="#">❤</a>
-        <a href="#">🛒</a>
-    </div>
-</header>
+@await Html.PartialAsync("_Header")
 
 <section class="main-layout">
     <aside class="category-panel">
         <h3>Категорії</h3>
-        <a>💻 Ноутбуки</a>
-        <a>📱 Смартфони</a>
-        <a>📺 Телевізори</a>
-        <a>🎧 Навушники</a>
-        <a>🏠 Побутова техніка</a>
+        <a asp-controller="Product" asp-action="Index" asp-route-category="Ноутбуки">💻 Ноутбуки</a>
+        <a asp-controller="Product" asp-action="Index" asp-route-category="Смартфони">📱 Смартфони</a>
+        <a asp-controller="Product" asp-action="Index" asp-route-category="Телевізори">📺 Телевізори</a>
+        <a asp-controller="Product" asp-action="Index" asp-route-category="Навушники">🎧 Навушники</a>
+        <a asp-controller="Product" asp-action="Index" asp-route-category="Побутова техніка">🏠 Побутова техніка</a>
     </aside>
 
     <main class="home-content">
         <div class="banner">
-            <div>
+            <div class="banner-content">
+                <div class="banner-badge">🔥 Гарячі пропозиції</div>
                 <h1>Великий розпродаж техніки</h1>
                 <p>Знижки до 40% на популярні товари</p>
-                <a asp-controller="Product" asp-action="Index">Перейти до каталогу</a>
+                <a asp-controller="Product" asp-action="Index" class="banner-btn">Перейти до каталогу →</a>
             </div>
         </div>
 
-        <h2>Популярні товари</h2>
+        <div class="section-header">
+            <h2>Популярні товари</h2>
+            <a asp-controller="Product" asp-action="Index" class="see-all-link">Дивитись всі →</a>
+        </div>
 
         <div class="products-grid">
             <div class="home-product-card">
-                <span class="badge">Топ продажів</span>
-                <img src="/images/laptop.jpg" alt="Laptop" />
+                <span class="badge badge-top">Топ продажів</span>
+                <div class="card-img-wrap">
+                    <img src="/images/laptop.jpg" alt="Laptop" />
+                </div>
                 <h3>Lenovo IdeaPad</h3>
                 <p class="desc">15.6 Full HD / Ryzen 5 / 16GB RAM</p>
-                <p class="price">24 999 ₴</p>
-                <button>Купити</button>
+                <p class="price">24 999 <span class="currency">₴</span></p>
+                <button class="buy-btn">Купити</button>
             </div>
 
             <div class="home-product-card">
-                <span class="badge">Новинка</span>
-                <img src="/images/phone.jpg" alt="Phone" />
+                <span class="badge badge-new">Новинка</span>
+                <div class="card-img-wrap">
+                    <img src="/images/phone.jpg" alt="Phone" />
+                </div>
                 <h3>Samsung Galaxy S26</h3>
                 <p class="desc">AMOLED / 128GB / NFC</p>
-                <p class="price">16 499 ₴</p>
-                <button>Купити</button>
+                <p class="price">16 499 <span class="currency">₴</span></p>
+                <button class="buy-btn">Купити</button>
+            </div>
+
+            <div class="home-product-card">
+                <span class="badge badge-sale">-20%</span>
+                <div class="card-img-wrap">
+                    <img src="/images/laptop.jpg" alt="Laptop" />
+                </div>
+                <h3>ASUS VivoBook 15</h3>
+                <p class="desc">15.6 FHD / Intel i5 / 8GB RAM</p>
+                <p class="price">19 499 <span class="currency">₴</span></p>
+                <button class="buy-btn">Купити</button>
+            </div>
+
+            <div class="home-product-card">
+                <div class="card-img-wrap">
+                    <img src="/images/phone.jpg" alt="Phone" />
+                </div>
+                <h3>iPhone 16</h3>
+                <p class="desc">6.1" OLED / 256GB / 5G</p>
+                <p class="price">42 999 <span class="currency">₴</span></p>
+                <button class="buy-btn">Купити</button>
+            </div>
+        </div>
+
+        <div class="promo-grid">
+            <div class="promo-card promo-blue">
+                <h3>Смартфони</h3>
+                <p>Найкращі пропозиції</p>
+                <a asp-controller="Product" asp-action="Index" asp-route-category="Смартфони">Обрати →</a>
+            </div>
+            <div class="promo-card promo-dark">
+                <h3>Ноутбуки</h3>
+                <p>Для роботи і навчання</p>
+                <a asp-controller="Product" asp-action="Index" asp-route-category="Ноутбуки">Обрати →</a>
+            </div>
+            <div class="promo-card promo-green">
+                <h3>Аксесуари</h3>
+                <p>Завжди в наявності</p>
+                <a asp-controller="Product" asp-action="Index">Обрати →</a>
             </div>
         </div>
     </main>

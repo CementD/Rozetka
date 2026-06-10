@@ -1,0 +1,36 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<Domain.User> SignInManager
+
+<header class="site-header">
+    <div class="header-inner">
+        <a asp-controller="Home" asp-action="Index" class="site-logo">ROZETKA</a>
+
+        <a asp-controller="Product" asp-action="Index" class="catalog-btn">
+            <span class="catalog-icon">☰</span> Каталог
+        </a>
+
+        <div class="header-search">
+            <form asp-controller="Product" asp-action="Index" method="get">
+                <input type="text" name="search" placeholder="Я шукаю..." value="@ViewData["Search"]" autocomplete="off" />
+                <button type="submit">Знайти</button>
+            </form>
+        </div>
+
+        <div class="header-actions">
+            @if (SignInManager.IsSignedIn(User))
+            {
+                <form asp-controller="Account" asp-action="Logout" method="post" style="display:inline">
+                    <button type="submit" class="header-icon-btn" title="Вийти">👤</button>
+                </form>
+            }
+            else
+            {
+                <a asp-controller="Account" asp-action="Login" class="header-icon-btn" title="Увійти">👤</a>
+            }
+            <a href="#" class="header-icon-btn" title="Обране">❤</a>
+            <a href="#" class="header-icon-btn cart-btn" title="Кошик">
+                🛒 <span class="cart-count">0</span>
+            </a>
+        </div>
+    </div>
+</header>
