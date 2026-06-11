@@ -1,0 +1,54 @@
+﻿@model Rozetka.ViewModels.Admin.OrderDetailsVM
+
+<h1>Замовлення #@Model.Id</h1>
+
+<p>Дата: @Model.OrderDate</p>
+
+<p>Статус: @Model.Status</p>
+
+<p>
+    Користувач:
+    <a asp-action="UserDetails"
+       asp-route-id="@Model.UserId">
+        @Model.UserName
+    </a>
+</p>
+
+<table class="admin-table">
+
+    <thead>
+        <tr>
+            <th>Товар</th>
+            <th>Кількість</th>
+            <th>Ціна</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+        @foreach (var item in Model.Items)
+        {
+            <tr>
+
+                <td>
+                    <a asp-action="ProductDetails"
+                       asp-route-id="@item.ProductId">
+                        @item.ProductName
+                    </a>
+                </td>
+
+                <td>@item.Quantity</td>
+
+                <td>@item.UnitPrice ₴</td>
+
+            </tr>
+        }
+
+    </tbody>
+
+</table>
+
+<h3>
+    Разом:
+    @Model.Items.Sum(x => x.Quantity * x.UnitPrice) ₴
+</h3>
