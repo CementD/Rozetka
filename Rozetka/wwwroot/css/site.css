@@ -595,7 +595,8 @@ button, input, textarea {
 }
 
 .login-card {
-    width: 420px;
+    width: 100%;
+    max-width: 560px;
     background: white;
     border-radius: 18px;
     padding: 35px;
@@ -1162,9 +1163,7 @@ button, input, textarea {
 }
 
 
-/* ═══════════════════════════════════════
-   DETAILS PAGES
-   ═══════════════════════════════════════ */
+/* DETAILS PAGES */
 
 .details-grid {
     display: grid;
@@ -1423,4 +1422,58 @@ button, input, textarea {
 .td-email {
     color: #6b7280;
     font-size: 14px;
+}
+
+
+/* ── REGISTER ── */
+
+.register-card {
+    width: 520px;
+}
+
+.login-logo {
+    font-size: 28px;
+    font-weight: 900;
+    color: #00a046;
+    margin-bottom: 12px;
+    letter-spacing: -1px;
+}
+
+.form-row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.input-password-wrap {
+    position: relative;
+}
+
+    .input-password-wrap .form-input {
+        padding-right: 44px;
+    }
+
+.password-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #9ca3af;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 0;
+    transition: color .15s;
+}
+
+    .password-toggle:hover {
+        color: #374151;
+    }
+
+/* ── REGISTER ── */
+.register-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
 }
