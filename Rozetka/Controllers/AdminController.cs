@@ -18,16 +18,22 @@ namespace Rozetka.Controllers
 
         public AdminController(
             IProductRepository productRepo,
-            ICategoryRepository categoryRepo)
+            ICategoryRepository categoryRepo,
+            IUserRepository userRepo,
+            IOrderRepository orderRepo)
         {
             _productRepo = productRepo;
             _categoryRepo = categoryRepo;
+            _userRepo = userRepo;
+            _orderRepo = orderRepo;
         }
 
         public async Task<IActionResult> Index(string tab = "products")
         {
             var products = await _productRepo.GetAllAsync();
             var categories = await _categoryRepo.GetAllAsync();
+            var users = await _userRepo.GetAllAsync();
+            var orders = await _orderRepo.GetAllAsync();
 
             var model = new AdminIndexVM
             {
@@ -50,9 +56,29 @@ namespace Rozetka.Controllers
                     Id = c.Id,
                     Name = c.Name
                 }).ToList(),
+                Orders = orders.Select(o => new OrderVM
+                {
+                    Id = o.Id,
+                    OrderDate = o.OrderDate,
+                    Status = o.Status,
+                    UserId = o.UserId,
+                    UserName = o.User?.UserName,
+                    Total = o.OrderItems.Sum(i => i.UnitPrice * i.Quantity),
+                    OrderItemsCount = o.OrderItems.Count()
+                }).ToList(),
+                Users = users.Select(u => new UserVM
+                {
+                    Id = u.Id,
+                    Email = u.Email,
+                    FullName = $"{u.FirstName} {u.LastName}",
+                    PhoneNumber = u.PhoneNumber,
+                    OrdersCount = u.Orders?.Count ?? 0
+                }).ToList(),
 
                 ProductsCount = products.Count(),
-                CategoriesCount = categories.Count()
+                CategoriesCount = categories.Count(),
+                OrdersCount = orders.Count(),
+                UsersCount = users.Count(),
             };
 
             return View(model);
@@ -334,6 +360,7 @@ namespace Rozetka.Controllers
                 Items = order.OrderItems.Select(i => new OrderItemVM
                 {
                     ProductName = i.Product.Name,
+                    ProductId = i.ProductId,
                     Quantity = i.Quantity,
                     UnitPrice = i.UnitPrice
                 }).ToList()
@@ -354,6 +381,8 @@ namespace Rozetka.Controllers
                 Id = user.Id,
                 Email = user.Email,
                 FullName = $"{user.FirstName} {user.LastName}",
+                PhoneNumber = user.PhoneNumber,
+                Address = user.Address,
 
                 Orders = user.Orders.Select(o => new OrderMiniVM
                 {

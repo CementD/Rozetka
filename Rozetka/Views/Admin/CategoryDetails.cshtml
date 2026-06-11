@@ -1,0 +1,34 @@
+﻿@model Rozetka.ViewModels.Admin.CategoryDetailsVM
+
+<h1>@Model.Name</h1>
+
+<p>Товарів: @Model.Products.Count</p>
+
+<table class="admin-table">
+    <thead>
+        <tr>
+            <th>Назва</th>
+            <th>Ціна</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+        @foreach (var product in Model.Products)
+        {
+            <tr>
+
+                <td>
+                    <a asp-action="ProductDetails"
+                       asp-route-id="@product.Id">
+                        @product.Name
+                    </a>
+                </td>
+
+                <td>@product.Price ₴</td>
+
+            </tr>
+        }
+
+    </tbody>
+</table>

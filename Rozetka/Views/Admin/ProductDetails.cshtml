@@ -1,0 +1,45 @@
+﻿@model Rozetka.ViewModels.Admin.ProductDetailsVM
+
+<div class="details-card">
+
+    <img src="@Model.ImageUrl" class="details-image" />
+
+    <h1>@Model.Name</h1>
+
+    <p>@Model.Description</p>
+
+    <h3>Ціна</h3>
+    <p>@Model.Price ₴</p>
+
+    <h3>Категорія</h3>
+
+    <a asp-action="CategoryDetails"
+       asp-route-id="@Model.CategoryId">
+        @Model.CategoryName
+    </a>
+
+    <h3>Характеристики</h3>
+
+    <ul>
+        @foreach (var spec in Model.Specifications
+                .Split(';', StringSplitOptions.RemoveEmptyEntries))
+        {
+            <li>@spec.Trim()</li>
+        }
+    </ul>
+
+    <h3>Замовлення (@Model.OrdersCount)</h3>
+
+    <ul>
+        @foreach (var order in Model.Orders)
+        {
+            <li>
+                <a asp-action="OrderDetails"
+                   asp-route-id="@order.Id">
+                    Замовлення #@order.Id
+                </a>
+            </li>
+        }
+    </ul>
+
+</div>
