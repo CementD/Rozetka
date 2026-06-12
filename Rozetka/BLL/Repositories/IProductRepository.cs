@@ -1,8 +1,9 @@
 using Domain;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Domain;
 
-namespace BLL.Repositories
+namespace Rozetka.BLL.Repositories
 {
     public interface IProductRepository
     {

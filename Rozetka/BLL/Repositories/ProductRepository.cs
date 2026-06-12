@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace BLL.Repositories
+namespace Rozetka.BLL.Repositories
 {
     public class ProductRepository : IProductRepository
     {

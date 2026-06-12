@@ -1,21 +1,36 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Rozetka.Models;
+using Rozetka.BLL.Repositories;
+using System.Threading.Tasks;
+using ViewModels;
+
 
 namespace Rozetka.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly IProductRepository _productRepo;
+        private readonly ICategoryRepository _categoryRepo;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, IProductRepository productRepo, ICategoryRepository categoryRepo)
         {
             _logger = logger;
+            _productRepo = productRepo;
+            _categoryRepo = categoryRepo;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var products = await _productRepo.GetAllAsync();
+            var categories = await _categoryRepo.GetAllAsync();
+            var vm = new HomeViewModel
+            {
+                Products = products,
+                Categories = categories
+            };
+            return View(vm);
         }
 
         public IActionResult Privacy()

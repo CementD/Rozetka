@@ -1,6 +1,6 @@
 ﻿using Domain;
 using Microsoft.AspNetCore.Mvc;
-using BLL.Repositories;
+using Rozetka.BLL.Repositories;
 using System.Threading.Tasks;
 
 namespace Rozetka.Controllers
