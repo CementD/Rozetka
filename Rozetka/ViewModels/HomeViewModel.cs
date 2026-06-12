@@ -1,7 +1,7 @@
 using Domain;
 using System.Collections.Generic;
 
-namespace ViewModels
+namespace Rozetka.ViewModels
 {
     public class HomeViewModel
     {

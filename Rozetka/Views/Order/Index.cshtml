@@ -1,0 +1,89 @@
+@model List<Domain.Order>
+@{
+    ViewData["Title"] = "Мої замовлення";
+}
+
+@await Html.PartialAsync("_Header")
+
+<div class="page-layout">
+    <div class="page-header">
+        <h1><i class="fa-solid fa-box"></i> Мої замовлення</h1>
+        <a asp-controller="Product" asp-action="Index" class="cancel-btn">
+            <i class="fa-solid fa-store"></i> До каталогу
+        </a>
+    </div>
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="empty-state">
+            <i class="fa-solid fa-box-open empty-icon"></i>
+            <h2>Замовлень ще немає</h2>
+            <p>Оформте перше замовлення в нашому каталозі</p>
+            <a asp-controller="Product" asp-action="Index" class="buy-btn" style="display:inline-flex;padding:14px 28px">
+                <i class="fa-solid fa-store"></i>&nbsp; До каталогу
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="orders-list">
+            @foreach (var order in Model.OrderByDescending(o => o.OrderDate))
+            {
+                var total = order.OrderItems?.Sum(i => i.UnitPrice * i.Quantity) ?? 0;
+                <div class="order-card">
+                    <div class="order-card-header">
+                        <div class="order-card-id">
+                            <i class="fa-solid fa-receipt"></i>
+                            Замовлення #@order.Id
+                        </div>
+                        <span class="td-status td-status-@(order.Status?.ToLower() ?? "")">
+                            @(order.Status ?? "—")
+                        </span>
+                    </div>
+
+                    <div class="order-card-body">
+                        <div class="order-card-meta">
+                            <span><i class="fa-regular fa-calendar"></i> @order.OrderDate.ToString("dd.MM.yyyy HH:mm")</span>
+                            <span><i class="fa-solid fa-box"></i> @(order.OrderItems?.Count ?? 0) позицій</span>
+                            <span class="td-price">@total.ToString("N0") ₴</span>
+                        </div>
+
+                        @if (order.OrderItems != null && order.OrderItems.Any())
+                        {
+                            <div class="order-card-products">
+                                @foreach (var item in order.OrderItems.Take(3))
+                                {
+                                    <div class="order-mini-product">
+                                        <img src="@(string.IsNullOrEmpty(item.Product?.ImageUrl) ? "/images/phone.jpg" : item.Product.ImageUrl)"
+                                             onerror="this.src='/images/phone.jpg'" />
+                                    </div>
+                                }
+                                @if (order.OrderItems.Count > 3)
+                                {
+                                    <div class="order-mini-more">+@(order.OrderItems.Count - 3)</div>
+                                }
+                            </div>
+                        }
+                    </div>
+
+                    <div class="order-card-footer">
+                        <a asp-controller="Order" asp-action="Details" asp-route-id="@order.Id" class="order-details-btn">
+                            <i class="fa-solid fa-circle-info"></i> Деталі замовлення
+                        </a>
+                        @if (order.Status?.ToLower() is "pending" or "нова" or "new")
+                        {
+                            <form asp-controller="Order" asp-action="Cancel" method="post" style="display:inline">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@order.Id" />
+                                <button type="submit" class="order-cancel-btn"
+                                        onclick="return confirm('Скасувати замовлення #@order.Id?')">
+                                    <i class="fa-solid fa-xmark"></i> Скасувати
+                                </button>
+                            </form>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

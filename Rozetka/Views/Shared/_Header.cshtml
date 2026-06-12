@@ -19,7 +19,11 @@
         <div class="header-actions">
             @if (SignInManager.IsSignedIn(User))
             {
+                <a asp-controller="Order" asp-action="Index" class="header-icon-btn" title="Мої замовлення">
+                    <i class="fa-solid fa-box"></i>
+                </a>
                 <form asp-controller="Account" asp-action="Logout" method="post" style="display:inline">
+                    @Html.AntiForgeryToken()
                     <button type="submit" class="header-icon-btn" title="Вийти">
                         <i class="fa-solid fa-circle-user"></i>
                     </button>
@@ -34,9 +38,8 @@
             <a href="#" class="header-icon-btn" title="Обране">
                 <i class="fa-regular fa-heart"></i>
             </a>
-            <a href="#" class="header-icon-btn cart-btn" title="Кошик">
+            <a asp-controller="Cart" asp-action="Index" class="header-icon-btn cart-btn" title="Кошик">
                 <i class="fa-solid fa-cart-shopping"></i>
-                <span class="cart-count">0</span>
             </a>
         </div>
     </div>
