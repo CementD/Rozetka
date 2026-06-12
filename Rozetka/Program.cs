@@ -1,5 +1,4 @@
 using Domain;
-using BLL.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Rozetka.Controllers;
@@ -29,6 +28,7 @@ namespace Rozetka
             builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
             builder.Services.AddScoped<IOrderRepository, OrderRepository>();
             builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<Rozetka.BLL.Repositories.ICartRepository, Rozetka.BLL.Repositories.CartRepository>();
 
             var app = builder.Build();
 
