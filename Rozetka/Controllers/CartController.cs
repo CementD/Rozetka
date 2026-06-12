@@ -16,15 +16,12 @@ namespace Rozetka.Controllers
             _cartRepo = cartRepo;
         }
 
-        private string GetUserId()
-        {
-            return User.FindFirstValue(ClaimTypes.NameIdentifier);
-        }
+        private string GetUserId() =>
+            User.FindFirstValue(ClaimTypes.NameIdentifier);
 
         public async Task<IActionResult> Index()
         {
-            var userId = GetUserId();
-            var cart = await _cartRepo.GetUserCartAsync(userId);
+            var cart = await _cartRepo.GetUserCartAsync(GetUserId());
             return View(cart);
         }
 
@@ -32,8 +29,15 @@ namespace Rozetka.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddToCart(int productId)
         {
-            var userId = GetUserId();
-            await _cartRepo.AddToCartAsync(userId, productId);
+            await _cartRepo.AddToCartAsync(GetUserId(), productId);
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateQuantity(int cartItemId, int delta)
+        {
+            await _cartRepo.UpdateQuantityAsync(cartItemId, delta);
             return RedirectToAction("Index");
         }
 
@@ -49,8 +53,7 @@ namespace Rozetka.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ClearCart()
         {
-            var userId = GetUserId();
-            await _cartRepo.ClearCartAsync(userId);
+            await _cartRepo.ClearCartAsync(GetUserId());
             return RedirectToAction("Index");
         }
     }

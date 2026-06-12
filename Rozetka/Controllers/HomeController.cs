@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Rozetka.Models;
 using Rozetka.BLL.Repositories;
 using System.Threading.Tasks;
-using ViewModels;
+using Rozetka.ViewModels;
 
 
 namespace Rozetka.Controllers

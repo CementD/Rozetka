@@ -123,9 +123,13 @@
                             }
                             <div class="price">@product.Price.ToString("N0") <span class="currency">₴</span></div>
                             <div class="card-actions">
-                                <button class="buy-btn">
-                                    <i class="fa-solid fa-cart-plus"></i> Купити
-                                </button>
+                                <form asp-controller="Cart" asp-action="AddToCart" method="post" style="flex:1">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="productId" value="@product.Id" />
+                                    <button type="submit" class="buy-btn">
+                                        <i class="fa-solid fa-cart-plus"></i> Купити
+                                    </button>
+                                </form>
                                 <a asp-controller="Product" asp-action="Details" asp-route-id="@product.Id" class="details-btn">
                                     <i class="fa-solid fa-circle-info"></i>
                                 </a>

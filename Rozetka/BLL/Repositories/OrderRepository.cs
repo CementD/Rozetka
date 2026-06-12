@@ -43,6 +43,7 @@ namespace Rozetka.BLL.Repositories
         {
             return await _db.Orders
                 .Include(o => o.OrderItems)
+                    .ThenInclude(i => i.Product)
                 .Where(o => o.UserId == userId)
                 .ToListAsync();
         }

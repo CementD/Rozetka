@@ -1,0 +1,135 @@
+@model Domain.Order
+@{
+    ViewData["Title"] = "Замовлення #" + Model.Id;
+    var total = Model.OrderItems?.Sum(i => i.UnitPrice * i.Quantity) ?? 0;
+}
+
+@await Html.PartialAsync("_Header")
+
+<div class="page-layout">
+    <div class="page-header">
+        <div>
+            <h1><i class="fa-solid fa-receipt"></i> Замовлення #@Model.Id</h1>
+            <p class="page-sub">@Model.OrderDate.ToString("dd MMMM yyyy, HH:mm")</p>
+        </div>
+        <a asp-controller="Order" asp-action="Index" class="cancel-btn">
+            <i class="fa-solid fa-arrow-left"></i> Мої замовлення
+        </a>
+    </div>
+
+    <div class="order-details-grid">
+
+        <div class="order-status-card">
+            <div class="order-status-icon order-status-icon-@(Model.Status?.ToLower() ?? "")">
+                @if (Model.Status?.ToLower() is "delivered" or "доставлено")
+                {
+                    <i class="fa-solid fa-circle-check"></i>
+                }
+                else if (Model.Status?.ToLower() is "cancelled" or "скасовано")
+                {
+                    <i class="fa-solid fa-circle-xmark"></i>
+                }
+                else if (Model.Status?.ToLower() is "shipped" or "відправлено")
+                {
+                    <i class="fa-solid fa-truck"></i>
+                }
+                else
+                {
+                    <i class="fa-solid fa-clock"></i>
+                }
+            </div>
+            <div class="order-status-text">
+                <span class="td-status td-status-@(Model.Status?.ToLower() ?? "")">@(Model.Status ?? "—")</span>
+                <p>@Model.OrderDate.ToString("dd.MM.yyyy")</p>
+            </div>
+        </div>
+
+        <div class="details-card">
+            <h3 class="details-card-title"><i class="fa-solid fa-circle-info"></i> Інформація</h3>
+            <div class="details-row">
+                <span class="details-label">Номер</span>
+                <span>#@Model.Id</span>
+            </div>
+            <div class="details-row">
+                <span class="details-label">Дата</span>
+                <span>@Model.OrderDate.ToString("dd.MM.yyyy HH:mm")</span>
+            </div>
+            <div class="details-row">
+                <span class="details-label">Статус</span>
+                <span class="td-status td-status-@(Model.Status?.ToLower() ?? "")">@(Model.Status ?? "—")</span>
+            </div>
+            <div class="details-row">
+                <span class="details-label">Позицій</span>
+                <span class="td-badge">@(Model.OrderItems?.Count ?? 0)</span>
+            </div>
+            <div class="details-row">
+                <span class="details-label">Сума</span>
+                <span class="td-price">@total.ToString("N0") ₴</span>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="cart-items" style="margin-top:0">
+        <div class="order-items-header">
+            <h2><i class="fa-solid fa-box"></i> Склад замовлення</h2>
+            <span class="product-count">@(Model.OrderItems?.Count ?? 0) позицій</span>
+        </div>
+
+        @if (Model.OrderItems == null || !Model.OrderItems.Any())
+        {
+            <div class="admin-empty">
+                <i class="fa-solid fa-box-open"></i>
+                <p>Позицій немає</p>
+            </div>
+        }
+        else
+        {
+            @foreach (var item in Model.OrderItems)
+            {
+                <div class="cart-item">
+                    <div class="cart-item-img">
+                        <img src="@(string.IsNullOrEmpty(item.Product?.ImageUrl) ? "/images/phone.jpg" : item.Product.ImageUrl)"
+                             alt="@item.Product?.Name" onerror="this.src='/images/phone.jpg'" />
+                    </div>
+                    <div class="cart-item-info">
+                        <h3 class="cart-item-name">@(item.Product?.Name ?? "Товар #" + item.ProductId)</h3>
+                        <div class="cart-item-meta">
+                            <span class="cart-item-qty"><i class="fa-solid fa-xmark"></i> @item.Quantity</span>
+                            <span class="cart-item-price">@item.UnitPrice.ToString("N0") ₴ / шт.</span>
+                        </div>
+                    </div>
+                    <div class="cart-item-total">
+                        <span class="td-price">@((item.UnitPrice * item.Quantity).ToString("N0")) ₴</span>
+                    </div>
+                </div>
+            }
+
+            <div class="cart-summary-total" style="margin:0 24px 24px">
+                <span>Разом</span>
+                <span class="td-price">@total.ToString("N0") ₴</span>
+            </div>
+        }
+    </div>
+
+    <div class="order-actions">
+        <a asp-controller="Order" asp-action="Index" class="cancel-btn">
+            <i class="fa-solid fa-arrow-left"></i> До списку замовлень
+        </a>
+        @if (Model.Status?.ToLower() is "pending" or "нова" or "new")
+        {
+            <form asp-controller="Order" asp-action="Cancel" method="post" style="display:inline">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" value="@Model.Id" />
+                <button type="submit" class="order-cancel-btn"
+                        onclick="return confirm('Скасувати замовлення #@Model.Id?')">
+                    <i class="fa-solid fa-xmark"></i> Скасувати замовлення
+                </button>
+            </form>
+        }
+        <a asp-controller="Product" asp-action="Index" class="buy-btn" style="display:inline-flex;padding:12px 24px">
+            <i class="fa-solid fa-store"></i>&nbsp; Продовжити покупки
+        </a>
+    </div>
+
+</div>
