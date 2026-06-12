@@ -1,0 +1,130 @@
+﻿@model Rozetka.ViewModels.Admin.OrderDetailsVM
+@{
+    ViewData["Title"] = "Замовлення #" + Model.Id;
+    var total = Model.Items?.Sum(i => i.UnitPrice * i.Quantity) ?? 0;
+}
+
+<div class="admin-layout">
+    <aside class="admin-sidebar">
+        <div class="admin-logo"><i class="fa-solid fa-store"></i> ROZETKA</div>
+        <nav class="admin-nav">
+            <a asp-action="Index" asp-route-tab="products" class="admin-nav-link"><i class="fa-solid fa-box"></i> Товари</a>
+            <a asp-action="Index" asp-route-tab="categories" class="admin-nav-link"><i class="fa-solid fa-list"></i> Категорії</a>
+            <a asp-action="Index" asp-route-tab="orders" class="admin-nav-link active"><i class="fa-solid fa-cart-shopping"></i> Замовлення</a>
+            <a asp-action="Index" asp-route-tab="users" class="admin-nav-link"><i class="fa-solid fa-users"></i> Користувачі</a>
+        </nav>
+        <div class="admin-sidebar-footer">
+            <a asp-controller="Home" asp-action="Index" class="admin-nav-link"><i class="fa-solid fa-arrow-left"></i> На сайт</a>
+        </div>
+    </aside>
+
+    <main class="admin-content">
+        <div class="admin-topbar">
+            <div>
+                <h1 class="admin-page-title">Замовлення #@Model.Id</h1>
+                <p class="admin-page-sub">@Model.OrderDate.ToString("dd MMMM yyyy, HH:mm")</p>
+            </div>
+            <a asp-action="Index" asp-route-tab="orders" class="cancel-btn">
+                <i class="fa-solid fa-arrow-left"></i> Назад
+            </a>
+        </div>
+
+        <div class="details-grid">
+
+            <div class="details-card">
+                <h3 class="details-card-title"><i class="fa-solid fa-receipt"></i> Інформація</h3>
+                <div class="details-row">
+                    <span class="details-label">Статус</span>
+                    <span class="td-status td-status-@(Model.Status?.ToLower() ?? "")">
+                        @(Model.Status ?? "—")
+                    </span>
+                </div>
+                <div class="details-row">
+                    <span class="details-label">Дата</span>
+                    <span>@Model.OrderDate.ToString("dd.MM.yyyy HH:mm")</span>
+                </div>
+                <div class="details-row">
+                    <span class="details-label">Покупець</span>
+                    @if (!string.IsNullOrEmpty(Model.UserId))
+                    {
+                        <a asp-action="UserDetails" asp-route-id="@Model.UserId" class="details-link">
+                            <i class="fa-solid fa-user"></i> @(Model.UserName ?? Model.UserId)
+                        </a>
+                    }
+                    else
+                    {
+                        <span>—</span>
+                    }
+                </div>
+                <div class="details-row">
+                    <span class="details-label">Позицій</span>
+                    <span class="td-badge">@(Model.Items?.Count ?? 0)</span>
+                </div>
+                <div class="details-row">
+                    <span class="details-label">Сума</span>
+                    <span class="td-price">@total.ToString("N0") ₴</span>
+                </div>
+            </div>
+
+            <div class="details-card details-card-summary">
+                <h3 class="details-card-title"><i class="fa-solid fa-hryvnia-sign"></i> Підсумок</h3>
+                <div class="summary-total">
+                    <span>Разом до сплати</span>
+                    <strong class="summary-price">@total.ToString("N0") ₴</strong>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="table-wrapper">
+            <div class="table-header">
+                <h2 class="table-title">Склад замовлення</h2>
+                <span class="product-count">@(Model.Items?.Count ?? 0) позицій</span>
+            </div>
+            @if (Model.Items == null || !Model.Items.Any())
+            {
+                <div class="admin-empty">
+                    <i class="fa-solid fa-box-open"></i>
+                    <p>Позицій немає</p>
+                </div>
+            }
+            else
+            {
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Товар</th>
+                            <th>Ціна за од.</th>
+                            <th>Кількість</th>
+                            <th>Сума</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Items)
+                        {
+                            <tr>
+                                <td><span class="td-name">@item.ProductName</span></td>
+                                <td>@item.UnitPrice.ToString("N0") ₴</td>
+                                <td><span class="td-badge">× @item.Quantity</span></td>
+                                <td class="td-price">@((item.UnitPrice * item.Quantity).ToString("N0")) ₴</td>
+                                <td>
+                                    <a asp-action="ProductDetails" asp-route-id="@item.ProductId" class="info-btn" title="Деталі товару">
+                                        <i class="fa-solid fa-circle-info"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr class="table-total">
+                            <td colspan="3"><strong>Разом</strong></td>
+                            <td class="td-price" colspan="2"><strong>@total.ToString("N0") ₴</strong></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            }
+        </div>
+
+    </main>
+</div>

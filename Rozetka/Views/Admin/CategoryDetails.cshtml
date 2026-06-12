@@ -1,0 +1,116 @@
+﻿@model Rozetka.ViewModels.Admin.CategoryDetailsVM
+@{
+    ViewData["Title"] = "Категорія: " + Model.Name;
+}
+
+<div class="admin-layout">
+    <aside class="admin-sidebar">
+        <div class="admin-logo"><i class="fa-solid fa-store"></i> ROZETKA</div>
+        <nav class="admin-nav">
+            <a asp-action="Index" asp-route-tab="products" class="admin-nav-link"><i class="fa-solid fa-box"></i> Товари</a>
+            <a asp-action="Index" asp-route-tab="categories" class="admin-nav-link active"><i class="fa-solid fa-list"></i> Категорії</a>
+            <a asp-action="Index" asp-route-tab="orders" class="admin-nav-link"><i class="fa-solid fa-cart-shopping"></i> Замовлення</a>
+            <a asp-action="Index" asp-route-tab="users" class="admin-nav-link"><i class="fa-solid fa-users"></i> Користувачі</a>
+        </nav>
+        <div class="admin-sidebar-footer">
+            <a asp-controller="Home" asp-action="Index" class="admin-nav-link"><i class="fa-solid fa-arrow-left"></i> На сайт</a>
+        </div>
+    </aside>
+
+    <main class="admin-content">
+        <div class="admin-topbar">
+            <div>
+                <h1 class="admin-page-title">@Model.Name</h1>
+                <p class="admin-page-sub">@(Model.Products?.Count ?? 0) товарів у категорії</p>
+            </div>
+            <div style="display:flex;gap:10px">
+                <a asp-action="EditCategory" asp-route-id="@Model.Id" class="add-btn">
+                    <i class="fa-solid fa-pen"></i> Редагувати
+                </a>
+                <a asp-action="Index" asp-route-tab="categories" class="cancel-btn">
+                    <i class="fa-solid fa-arrow-left"></i> Назад
+                </a>
+            </div>
+        </div>
+
+        <div class="details-grid" style="margin-bottom:24px">
+            <div class="details-card">
+                <h3 class="details-card-title"><i class="fa-solid fa-circle-info"></i> Інформація</h3>
+                <div class="details-row">
+                    <span class="details-label">Назва</span>
+                    <span class="td-name">@Model.Name</span>
+                </div>
+                <div class="details-row">
+                    <span class="details-label">Товарів</span>
+                    <span class="td-badge">@(Model.Products?.Count ?? 0)</span>
+                </div>
+                @if (Model.Products != null && Model.Products.Any())
+                {
+                    <div class="details-row">
+                        <span class="details-label">Мін. ціна</span>
+                        <span>@Model.Products.Min(p => p.Price).ToString("N0") ₴</span>
+                    </div>
+                    <div class="details-row">
+                        <span class="details-label">Макс. ціна</span>
+                        <span>@Model.Products.Max(p => p.Price).ToString("N0") ₴</span>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="table-wrapper">
+            <div class="table-header">
+                <h2 class="table-title">Товари в категорії</h2>
+                <a asp-action="AddProduct" class="add-btn" style="font-size:13px;padding:8px 14px">
+                    <i class="fa-solid fa-plus"></i> Додати товар
+                </a>
+            </div>
+            @if (Model.Products == null || !Model.Products.Any())
+            {
+                <div class="admin-empty">
+                    <i class="fa-solid fa-box-open"></i>
+                    <p>У цій категорії поки немає товарів. <a asp-action="AddProduct">Додати перший</a></p>
+                </div>
+            }
+            else
+            {
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Фото</th>
+                            <th>Назва</th>
+                            <th>Ціна</th>
+                            <th>Дії</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var p in Model.Products)
+                        {
+                            <tr>
+                                <td class="td-id">#@p.Id</td>
+                                <td>
+                                    <img src="@(string.IsNullOrEmpty(p.ImageUrl) ? "/images/phone.jpg" : p.ImageUrl)"
+                                         class="product-img" onerror="this.src='/images/phone.jpg'" />
+                                </td>
+                                <td><span class="td-name">@p.Name</span></td>
+                                <td class="td-price">@p.Price.ToString("N0") ₴</td>
+                                <td>
+                                    <div class="actions">
+                                        <a asp-action="ProductDetails" asp-route-id="@p.Id" class="info-btn" title="Деталі">
+                                            <i class="fa-solid fa-circle-info"></i>
+                                        </a>
+                                        <a asp-action="EditProduct" asp-route-id="@p.Id" class="edit-btn" title="Редагувати">
+                                            <i class="fa-solid fa-pen"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+
+    </main>
+</div>

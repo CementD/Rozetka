@@ -1,0 +1,118 @@
+﻿@model Rozetka.ViewModels.Admin.UserDetailsVM
+@{
+    ViewData["Title"] = Model.FullName ?? "Користувач";
+}
+
+<div class="admin-layout">
+    <aside class="admin-sidebar">
+        <div class="admin-logo"><i class="fa-solid fa-store"></i> ROZETKA</div>
+        <nav class="admin-nav">
+            <a asp-action="Index" asp-route-tab="products" class="admin-nav-link"><i class="fa-solid fa-box"></i> Товари</a>
+            <a asp-action="Index" asp-route-tab="categories" class="admin-nav-link"><i class="fa-solid fa-list"></i> Категорії</a>
+            <a asp-action="Index" asp-route-tab="orders" class="admin-nav-link"><i class="fa-solid fa-cart-shopping"></i> Замовлення</a>
+            <a asp-action="Index" asp-route-tab="users" class="admin-nav-link active"><i class="fa-solid fa-users"></i> Користувачі</a>
+        </nav>
+        <div class="admin-sidebar-footer">
+            <a asp-controller="Home" asp-action="Index" class="admin-nav-link"><i class="fa-solid fa-arrow-left"></i> На сайт</a>
+        </div>
+    </aside>
+
+    <main class="admin-content">
+        <div class="admin-topbar">
+            <div>
+                <h1 class="admin-page-title">@(string.IsNullOrWhiteSpace(Model.FullName) ? "Користувач" : Model.FullName)</h1>
+                <p class="admin-page-sub">@Model.Email</p>
+            </div>
+            <a asp-action="Index" asp-route-tab="users" class="cancel-btn">
+                <i class="fa-solid fa-arrow-left"></i> Назад
+            </a>
+        </div>
+
+        <div class="details-grid">
+
+            <div class="details-card details-card-user">
+                <div class="user-avatar">
+                    <i class="fa-solid fa-circle-user"></i>
+                </div>
+                <div class="user-name">@(string.IsNullOrWhiteSpace(Model.FullName) ? "—" : Model.FullName)</div>
+                <div class="user-email">@Model.Email</div>
+                <div class="user-stats">
+                    <div class="user-stat">
+                        <span class="user-stat-val">@(Model.Orders?.Count ?? 0)</span>
+                        <span class="user-stat-label">замовлень</span>
+                    </div>
+                    <div class="user-stat">
+                        <span class="user-stat-val">
+                            @((Model.Orders?.Sum(o => (decimal?)0) ?? 0).ToString("N0")) ₴
+                        </span>
+                        <span class="user-stat-label">витрачено</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="details-card">
+                <h3 class="details-card-title"><i class="fa-solid fa-address-card"></i> Контакти</h3>
+                <div class="details-row">
+                    <span class="details-label">Email</span>
+                    <span class="td-email">@(Model.Email ?? "—")</span>
+                </div>
+                <div class="details-row">
+                    <span class="details-label">Телефон</span>
+                    <span>@(string.IsNullOrEmpty(Model.PhoneNumber) ? "—" : Model.PhoneNumber)</span>
+                </div>
+                <div class="details-row">
+                    <span class="details-label">Адреса</span>
+                    <span>@(string.IsNullOrEmpty(Model.Address) ? "—" : Model.Address)</span>
+                </div>
+                <div class="details-row">
+                    <span class="details-label">Замовлень</span>
+                    <span class="td-badge">@(Model.Orders?.Count ?? 0)</span>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="table-wrapper">
+            <div class="table-header">
+                <h2 class="table-title">Замовлення</h2>
+                <span class="product-count">@(Model.Orders?.Count ?? 0) замовлень</span>
+            </div>
+            @if (Model.Orders == null || !Model.Orders.Any())
+            {
+                <div class="admin-empty">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <p>Замовлень ще немає</p>
+                </div>
+            }
+            else
+            {
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Дата</th>
+                            <th>Статус</th>
+                            <th>Дії</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var order in Model.Orders)
+                        {
+                            <tr>
+                                <td class="td-id">#@order.Id</td>
+                                <td>@order.OrderDate.ToString("dd.MM.yyyy HH:mm")</td>
+                                <td><span class="td-status td-status-@(order.Status?.ToLower() ?? "")">@(order.Status ?? "—")</span></td>
+                                <td>
+                                    <a asp-action="OrderDetails" asp-route-id="@order.Id" class="info-btn" title="Деталі">
+                                        <i class="fa-solid fa-circle-info"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+
+    </main>
+</div>

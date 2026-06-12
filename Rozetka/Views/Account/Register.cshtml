@@ -1,0 +1,73 @@
+﻿@model Rozetka.ViewModels.RegisterVM
+
+@{
+    ViewData["Title"] = "Реєстрація";
+}
+
+<div class="login-page">
+    <div class="login-card">
+
+        <div class="login-header">
+            <h2>Створення акаунта</h2>
+            <p>Заповніть форму щоб зареєструватися</p>
+        </div>
+
+        <form asp-action="Register" method="post">
+            @Html.AntiForgeryToken()
+
+            <div asp-validation-summary="ModelOnly" class="text-danger admin-validation"></div>
+
+            <div class="form-row">
+                <div class="input-group">
+                    <label asp-for="FirstName"><i class="fa-solid fa-user"></i> Ім'я</label>
+                    <input asp-for="FirstName" class="form-input" placeholder="Іван" />
+                    <span asp-validation-for="FirstName" class="text-danger"></span>
+                </div>
+                <div class="input-group">
+                    <label asp-for="LastName"><i class="fa-solid fa-user"></i> Прізвище</label>
+                    <input asp-for="LastName" class="form-input" placeholder="Петренко" />
+                    <span asp-validation-for="LastName" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label asp-for="Email"><i class="fa-solid fa-envelope"></i> Email</label>
+                <input asp-for="Email" type="email" class="form-input" placeholder="example@email.com" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="input-group">
+                <label asp-for="PhoneNumber"><i class="fa-solid fa-phone"></i> Телефон</label>
+                <input asp-for="PhoneNumber" class="form-input" placeholder="+38 (099) 000-00-00" />
+                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+            </div>
+
+            <div class="input-group">
+                <label asp-for="Address"><i class="fa-solid fa-location-dot"></i> Адреса доставки</label>
+                <input asp-for="Address" class="form-input" placeholder="м. Київ, вул. Хрещатик, 1" />
+                <span asp-validation-for="Address" class="text-danger"></span>
+            </div>
+
+            <div class="input-group">
+                <label asp-for="Password"><i class="fa-solid fa-lock"></i> Пароль</label>
+                <input asp-for="Password" type="password" class="form-input" placeholder="Мінімум 6 символів" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="login-btn" style="margin-top:8px">
+                <i class="fa-solid fa-user-plus"></i> Зареєструватися
+            </button>
+
+        </form>
+
+        <div class="login-footer">
+            Вже маєте акаунт?
+            <a asp-action="Login">Увійти</a>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

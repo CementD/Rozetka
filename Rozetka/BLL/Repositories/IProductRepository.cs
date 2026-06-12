@@ -11,5 +11,7 @@ namespace BLL.Repositories
         Task AddAsync(Product product);
         Task DeleteAsync(int id);
         Task UpdateAsync(Product product);
+        Task<List<Order>> GetProductOrdersAsync(int productId);
+        Task<List<Product>> GetProductsByCategoryIdAsync(int categoryId);
     }
 }

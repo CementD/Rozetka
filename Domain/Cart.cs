@@ -6,13 +6,12 @@ using System.Threading.Tasks;
 
 namespace Domain
 {
-    public class Order
+    public class Cart
     {
         public int Id { get; set; }
-        public DateTime OrderDate { get; set; } = DateTime.UtcNow;
-        public string Status { get; set; }
         public string UserId { get; set; }
         public User User { get; set; }
-        public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+
+        public List<CartItem> Items { get; set; } = new();
     }
 }
