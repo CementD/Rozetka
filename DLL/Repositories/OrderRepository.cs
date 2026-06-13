@@ -1,7 +1,7 @@
 ﻿using Domain;
 using Microsoft.EntityFrameworkCore;
 
-namespace Rozetka.BLL.Repositories
+namespace DLL.Repositories
 {
     public class OrderRepository : IOrderRepository
     {
@@ -14,7 +14,10 @@ namespace Rozetka.BLL.Repositories
 
         public async Task<List<Order>> GetAllAsync()
         {
-            return await _db.Orders.ToListAsync();
+            return await _db.Orders
+                .Include(o => o.User)
+                .Include(o => o.OrderItems)
+                .ToListAsync();
         }
 
         public async Task<Order?> GetByIdAsync(int id)
@@ -64,7 +67,7 @@ namespace Rozetka.BLL.Repositories
         {
             var cart = await _db.Carts
                 .Include(c => c.Items)
-                    .ThenInclude(i => i.Product)
+                .ThenInclude(i => i.Product)
                 .FirstOrDefaultAsync(c => c.UserId == userId);
 
             if (cart == null || !cart.Items.Any()) return null;
@@ -88,8 +91,21 @@ namespace Rozetka.BLL.Repositories
             }
 
             _db.Orders.Add(order);
+
             _db.CartItems.RemoveRange(cart.Items);
-            await _db.SaveChangesAsync();
+
+            try
+            {
+                await _db.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                foreach (var entry in ex.Entries)
+                {
+                    await entry.ReloadAsync();
+                }
+                await _db.SaveChangesAsync();
+            }
 
             return order;
         }

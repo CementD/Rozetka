@@ -1,4 +1,4 @@
-﻿@model List<Domain.Product>
+﻿@model List<BLL.DTOs.ProductReadDto>
 @{
     ViewData["Title"] = "Каталог товарів";
     var categories = ViewData["Categories"] as List<string> ?? new List<string>();
@@ -106,9 +106,9 @@
                 @foreach (var product in Model)
                 {
                     <div class="product-card">
-                        @if (product.Category != null)
+                        @if (!string.IsNullOrEmpty(product.CategoryName))
                         {
-                            <span class="card-category">@product.Category.Name</span>
+                            <span class="card-category">@product.CategoryName</span>
                         }
                         <div class="card-img-wrap">
                             <img src="@(string.IsNullOrEmpty(product.ImageUrl) ? "/images/placeholder.jpg" : product.ImageUrl)"

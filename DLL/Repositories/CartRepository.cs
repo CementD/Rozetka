@@ -2,7 +2,7 @@ using Domain;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 
-namespace Rozetka.BLL.Repositories
+namespace DLL.Repositories
 {
     public class CartRepository : ICartRepository
     {

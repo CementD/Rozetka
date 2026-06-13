@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
-namespace Rozetka.BLL.Repositories
+namespace DLL.Repositories
 {
     public class UserRepository : IUserRepository
     {

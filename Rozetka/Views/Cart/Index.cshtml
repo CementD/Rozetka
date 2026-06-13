@@ -1,8 +1,8 @@
-@model Domain.Cart
+@model BLL.DTOs.CartReadDto
 @{
     ViewData["Title"] = "Кошик";
-    var items = Model?.Items ?? new List<Domain.CartItem>();
-    var total = items.Sum(i => i.Product?.Price * i.Quantity ?? 0);
+    var items = Model?.Items ?? new List<BLL.DTOs.CartItemReadDto>();
+    var total = Model?.CartTotal ?? 0m;
 }
 
 @await Html.PartialAsync("_Header")
@@ -35,25 +35,25 @@
                 {
                     <div class="cart-item">
                         <div class="cart-item-img">
-                            <img src="@(string.IsNullOrEmpty(item.Product?.ImageUrl) ? "/images/phone.jpg" : item.Product.ImageUrl)"
-                                 alt="@item.Product?.Name" onerror="this.src='/images/phone.jpg'" />
+                            <img src="@(string.IsNullOrEmpty(item.ProductImageUrl) ? "/images/phone.jpg" : item.ProductImageUrl)"
+                                 alt="@item.ProductName" onerror="this.src='/images/phone.jpg'" />
                         </div>
                         <div class="cart-item-info">
-                            <h3 class="cart-item-name">@item.Product?.Name</h3>
-                            @if (!string.IsNullOrEmpty(item.Product?.Description))
+                            <h3 class="cart-item-name">@item.ProductName</h3>
+                            @if (!string.IsNullOrEmpty(item.Description))
                             {
-                                <p class="cart-item-desc">@(item.Product.Description.Length > 80 ? item.Product.Description[..80] + "…" : item.Product.Description)</p>
+                                <p class="cart-item-desc">@(item.Description.Length > 80 ? item.Description[..80] + "…" : item.Description)</p>
                             }
                             <div class="cart-item-meta">
-                                <span class="cart-item-price">@item.Product?.Price.ToString("N0") ₴ / шт.</span>
+                                <span class="cart-item-price">@item.UnitPrice.ToString("N0") ₴ / шт.</span>
                             </div>
                         </div>
                         <div class="cart-item-total">
-                            <span class="td-price">@((item.Product?.Price * item.Quantity)?.ToString("N0")) ₴</span>
+                            <span class="td-price">@item.TotalPrice.ToString("N0") ₴</span>
                             <div class="qty-control">
                                 <form asp-controller="Cart" asp-action="UpdateQuantity" method="post">
                                     @Html.AntiForgeryToken()
-                                    <input type="hidden" name="cartItemId" value="@item.Id" />
+                                    <input type="hidden" name="cartItemId" value="@item.CartItemId" />
                                     <input type="hidden" name="delta" value="-1" />
                                     <button type="submit" class="qty-btn" title="Зменшити">
                                         <i class="fa-solid fa-minus"></i>
@@ -62,7 +62,7 @@
                                 <span class="qty-value">@item.Quantity</span>
                                 <form asp-controller="Cart" asp-action="UpdateQuantity" method="post">
                                     @Html.AntiForgeryToken()
-                                    <input type="hidden" name="cartItemId" value="@item.Id" />
+                                    <input type="hidden" name="cartItemId" value="@item.CartItemId" />
                                     <input type="hidden" name="delta" value="1" />
                                     <button type="submit" class="qty-btn" title="Збільшити">
                                         <i class="fa-solid fa-plus"></i>
@@ -71,7 +71,7 @@
                             </div>
                             <form asp-controller="Cart" asp-action="RemoveItem" method="post">
                                 @Html.AntiForgeryToken()
-                                <input type="hidden" name="cartItemId" value="@item.Id" />
+                                <input type="hidden" name="cartItemId" value="@item.CartItemId" />
                                 <button type="submit" class="cart-remove-btn" title="Видалити"
                                         onclick="return confirm('Видалити товар з кошика?')">
                                     <i class="fa-solid fa-trash"></i>

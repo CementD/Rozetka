@@ -33,12 +33,29 @@
 
             <div class="details-card">
                 <h3 class="details-card-title"><i class="fa-solid fa-receipt"></i> Інформація</h3>
-                <div class="details-row">
-                    <span class="details-label">Статус</span>
-                    <span class="td-status td-status-@(Model.Status?.ToLower() ?? "")">
-                        @(Model.Status ?? "—")
-                    </span>
-                </div>
+
+                <form asp-controller="Admin" asp-action="UpdateOrderStatus" method="post" style="margin-bottom: 15px;">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="orderId" value="@Model.Id" />
+
+                    <div class="details-row" style="align-items: center; margin-bottom: 10px;">
+                        <span class="details-label">Статус</span>
+                        <select name="status" style="padding: 6px 10px; border-radius: 6px; border: 1px solid #ccc; font-family: inherit; font-size: 14px; cursor: pointer;">
+                            <option value="Created" selected="@(Model.Status == "Created")">Нове (Created)</option>
+                            <option value="InProcessing" selected="@(Model.Status == "InProcessing")">В обробці</option>
+                            <option value="Shipped" selected="@(Model.Status == "Shipped")">Відправлено</option>
+                            <option value="Delivered" selected="@(Model.Status == "Delivered")">Доставлено</option>
+                            <option value="Canceled" selected="@(Model.Status == "Canceled")">Скасовано</option>
+                        </select>
+                    </div>
+
+                    <div style="text-align: right;">
+                        <button type="submit" class="save-btn" style="background-color: #00a044; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                            <i class="fa-solid fa-floppy-disk"></i> Зберегти статус
+                        </button>
+                    </div>
+                </form>
+
                 <div class="details-row">
                     <span class="details-label">Дата</span>
                     <span>@Model.OrderDate.ToString("dd.MM.yyyy HH:mm")</span>
