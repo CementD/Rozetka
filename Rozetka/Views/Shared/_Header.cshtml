@@ -1,0 +1,46 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<Domain.User> SignInManager
+
+<header class="site-header">
+    <div class="header-inner">
+        <a asp-controller="Home" asp-action="Index" class="site-logo">ROZETKA</a>
+
+        <a asp-controller="Product" asp-action="Index" class="catalog-btn">
+            <i class="fa-solid fa-bars"></i> Каталог
+        </a>
+
+        <div class="header-search">
+            <form asp-controller="Product" asp-action="Index" method="get">
+                <input type="text" name="search" placeholder="Я шукаю..." value="@ViewData["Search"]" autocomplete="off" />
+                <button type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
+            </form>
+        </div>
+
+        <div class="header-actions">
+            @if (SignInManager.IsSignedIn(User))
+            {
+                <a asp-controller="Order" asp-action="Index" class="header-icon-btn" title="Мої замовлення">
+                    <i class="fa-solid fa-box"></i>
+                </a>
+                <form asp-controller="Account" asp-action="Logout" method="post" style="display:inline">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="header-icon-btn" title="Вийти">
+                        <i class="fa-solid fa-circle-user"></i>
+                    </button>
+                </form>
+            }
+            else
+            {
+                <a asp-controller="Account" asp-action="Login" class="header-icon-btn" title="Увійти">
+                    <i class="fa-regular fa-circle-user"></i>
+                </a>
+            }
+            <a href="#" class="header-icon-btn" title="Обране">
+                <i class="fa-regular fa-heart"></i>
+            </a>
+            <a asp-controller="Cart" asp-action="Index" class="header-icon-btn cart-btn" title="Кошик">
+                <i class="fa-solid fa-cart-shopping"></i>
+            </a>
+        </div>
+    </div>
+</header>

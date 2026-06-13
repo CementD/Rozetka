@@ -1,0 +1,25 @@
+@model Rozetka.ViewModels.CheckoutVM
+
+@{
+    ViewData["Title"] = "Checkout";
+}
+
+<h2>Checkout</h2>
+
+<form asp-action="Checkout" method="post">
+    <div>
+        <label>Card Number</label>
+        <input asp-for="CardNumber" />
+    </div>
+    <div>
+        <label>Card Expiry</label>
+        <input asp-for="CardExpiry" />
+    </div>
+    <div>
+        <label>Card CVV</label>
+        <input asp-for="CardCvv" />
+    </div>
+    <div>
+        <button type="submit">Pay & Create Order</button>
+    </div>
+</form>

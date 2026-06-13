@@ -1,5 +1,5 @@
+using BLL;
 using Domain;
-using BLL.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Rozetka.Controllers;
@@ -13,18 +13,15 @@ namespace Rozetka
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-                ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-
-            builder.Services.AddDbContext<AppDbContext>(options =>
-                options.UseSqlServer(connectionString));
-
-            builder.Services.AddIdentity<User, IdentityRole>()
-                .AddEntityFrameworkStores<AppDbContext>()
-                .AddDefaultTokenProviders();
+            builder.Services.AddDataLayer(builder.Configuration);
 
             builder.Services.AddControllersWithViews();
-            builder.Services.AddScoped<IProductRepository, ProductRepository>();
+
+            builder.Services.AddRepositories();
+
+            builder.Services.AddServices();
+
+            builder.Services.AddHostedService<OrderStatusUpdaterBackgroundService>();
 
             var app = builder.Build();
 
@@ -41,6 +38,8 @@ namespace Rozetka
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+
 
             app.MapControllerRoute(
                 name: "default",

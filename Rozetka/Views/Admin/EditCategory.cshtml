@@ -1,0 +1,62 @@
+﻿@model Rozetka.ViewModels.Admin.CategoryVM
+@{
+    ViewData["Title"] = "Редагувати категорію";
+}
+
+<div class="admin-layout">
+    <aside class="admin-sidebar">
+        <div class="admin-logo"><i class="fa-solid fa-store"></i> ROZETKA</div>
+        <nav class="admin-nav">
+            <a asp-action="Index" asp-route-tab="products" class="admin-nav-link">
+                <i class="fa-solid fa-box"></i> Товари
+            </a>
+            <a asp-action="Index" asp-route-tab="categories" class="admin-nav-link active">
+                <i class="fa-solid fa-list"></i> Категорії
+            </a>
+            <a href="#" class="admin-nav-link"><i class="fa-solid fa-cart-shopping"></i> Замовлення</a>
+            <a href="#" class="admin-nav-link"><i class="fa-solid fa-users"></i> Користувачі</a>
+        </nav>
+        <div class="admin-sidebar-footer">
+            <a asp-controller="Home" asp-action="Index" class="admin-nav-link">
+                <i class="fa-solid fa-arrow-left"></i> На сайт
+            </a>
+        </div>
+    </aside>
+
+    <main class="admin-content">
+        <div class="admin-topbar">
+            <div>
+                <h1 class="admin-page-title">Редагувати категорію</h1>
+                <p class="admin-page-sub">#@Model.Id — @Model.Name</p>
+            </div>
+            <a asp-action="Index" asp-route-tab="categories" class="cancel-btn">
+                <i class="fa-solid fa-arrow-left"></i> Назад
+            </a>
+        </div>
+
+        <div class="form-card">
+            <form asp-action="EditCategory" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="Id" />
+                <div asp-validation-summary="ModelOnly" class="text-danger admin-validation"></div>
+
+                <div class="form-group">
+                    <label asp-for="Name"><i class="fa-solid fa-tag"></i> Назва категорії</label>
+                    <input asp-for="Name" class="form-input" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="save-btn">
+                        <i class="fa-solid fa-floppy-disk"></i> Зберегти зміни
+                    </button>
+                    <a asp-action="Index" asp-route-tab="categories" class="cancel-btn">Скасувати</a>
+                </div>
+            </form>
+        </div>
+    </main>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
