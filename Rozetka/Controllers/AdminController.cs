@@ -386,7 +386,8 @@ namespace Rozetka.Controllers
                 {
                     Id = o.Id,
                     OrderDate = o.OrderDate,
-                    Status = o.Status
+                    Status = o.Status,
+                    Total = o.Total
                 }).ToList()
             };
 

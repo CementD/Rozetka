@@ -69,18 +69,39 @@
 
     <main class="catalog-main">
 
+        <div class="catalog-search-bar">
+            <form asp-controller="Product" asp-action="Index" method="get" class="catalog-search-form">
+                <input type="hidden" name="category" value="@currentCategory" />
+                <input type="hidden" name="sort" value="@currentSort" />
+                <div class="catalog-search-input-wrap">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" name="search" value="@currentSearch"
+                           placeholder="Пошук у каталозі..." autocomplete="off" />
+                    @if (!string.IsNullOrEmpty(currentSearch))
+                    {
+                        <a asp-controller="Product" asp-action="Index"
+                           asp-route-category="@currentCategory"
+                           asp-route-sort="@currentSort"
+                           class="catalog-search-clear" title="Очистити">
+                            <i class="fa-solid fa-xmark"></i>
+                        </a>
+                    }
+                </div>
+                <button type="submit" class="catalog-search-btn">Знайти</button>
+            </form>
+        </div>
+
         <div class="catalog-top-bar">
             <div class="catalog-title-block">
                 <h1>@(string.IsNullOrEmpty(currentCategory) ? "Всі товари" : currentCategory)</h1>
                 @if (!string.IsNullOrEmpty(currentSearch))
                 {
                     <span class="search-hint">
-                        <i class="fa-solid fa-magnifying-glass"></i> Результати пошуку: «@currentSearch»
+                        <i class="fa-solid fa-magnifying-glass"></i> «@currentSearch»
                     </span>
                 }
                 <span class="product-count">@Model.Count товарів</span>
             </div>
-
             @if (!string.IsNullOrEmpty(currentCategory) || !string.IsNullOrEmpty(currentSearch))
             {
                 <a asp-controller="Product" asp-action="Index" class="reset-filters">
@@ -95,7 +116,8 @@
                 <i class="fa-solid fa-magnifying-glass empty-icon"></i>
                 <h2>Товарів не знайдено</h2>
                 <p>Спробуйте змінити фільтри або пошуковий запит</p>
-                <a asp-controller="Product" asp-action="Index" class="buy-btn" style="display:inline-block;padding:14px 28px;">
+                <a asp-controller="Product" asp-action="Index"
+                   class="buy-btn" style="display:inline-flex;padding:14px 28px">
                     Показати всі товари
                 </a>
             </div>
@@ -105,37 +127,35 @@
             <div class="product-grid">
                 @foreach (var product in Model)
                 {
-                    <div class="product-card">
+                    <a asp-controller="Product" asp-action="Details"
+                       asp-route-id="@product.Id" class="product-card">
                         @if (!string.IsNullOrEmpty(product.CategoryName))
                         {
                             <span class="card-category">@product.CategoryName</span>
                         }
                         <div class="card-img-wrap">
-                            <img src="@(string.IsNullOrEmpty(product.ImageUrl) ? "/images/placeholder.jpg" : product.ImageUrl)"
-                                 alt="@product.Name"
-                                 onerror="this.src='/images/phone.jpg'" />
+                            <img src="@(string.IsNullOrEmpty(product.ImageUrl) ? "/images/phone.jpg" : product.ImageUrl)"
+                                 alt="@product.Name" onerror="this.src='/images/phone.jpg'" />
                         </div>
                         <div class="card-body">
                             <h3>@product.Name</h3>
                             @if (!string.IsNullOrEmpty(product.Description))
                             {
-                                <p class="desc">@product.Description</p>
+                                <p class="desc">@(product.Description.Length > 70 ? product.Description[..70] + "…" : product.Description)</p>
                             }
                             <div class="price">@product.Price.ToString("N0") <span class="currency">₴</span></div>
                             <div class="card-actions">
-                                <form asp-controller="Cart" asp-action="AddToCart" method="post" style="flex:1">
+                                <form asp-controller="Cart" asp-action="AddToCart" method="post"
+                                      style="flex:1" onclick="event.stopPropagation()">
                                     @Html.AntiForgeryToken()
                                     <input type="hidden" name="productId" value="@product.Id" />
                                     <button type="submit" class="buy-btn">
                                         <i class="fa-solid fa-cart-plus"></i> Купити
                                     </button>
                                 </form>
-                                <a asp-controller="Product" asp-action="Details" asp-route-id="@product.Id" class="details-btn">
-                                    <i class="fa-solid fa-circle-info"></i>
-                                </a>
                             </div>
                         </div>
-                    </div>
+                    </a>
                 }
             </div>
         }

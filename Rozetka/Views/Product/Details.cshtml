@@ -1,0 +1,81 @@
+@model BLL.DTOs.ProductReadDto
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+@await Html.PartialAsync("_Header")
+
+<div class="page-layout">
+
+    <div class="product-details-grid">
+
+        <!-- Фото -->
+        <div class="product-details-img-wrap">
+            <img src="@(string.IsNullOrEmpty(Model.ImageUrl) ? "/images/phone.jpg" : Model.ImageUrl)"
+                 alt="@Model.Name" onerror="this.src='/images/phone.jpg'" />
+        </div>
+
+        <!-- Інфо -->
+        <div class="product-details-info">
+
+            @if (!string.IsNullOrEmpty(Model.CategoryName))
+            {
+                <a asp-controller="Product" asp-action="Index"
+                   asp-route-category="@Model.CategoryName"
+                   class="product-details-category">
+                    <i class="fa-solid fa-list"></i> @Model.CategoryName
+                </a>
+            }
+
+            <h1 class="product-details-name">@Model.Name</h1>
+
+            @if (!string.IsNullOrEmpty(Model.Description))
+            {
+                <p class="product-details-desc">@Model.Description</p>
+            }
+
+            <div class="product-details-price">
+                @Model.Price.ToString("N0") <span>₴</span>
+            </div>
+
+            <div class="product-details-actions">
+                <form asp-controller="Cart" asp-action="AddToCart" method="post" style="flex:1">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="productId" value="@Model.Id" />
+                    <button type="submit" class="order-btn" style="margin-top:0">
+                        <i class="fa-solid fa-cart-plus"></i> Додати до кошика
+                    </button>
+                </form>
+                <a asp-controller="Product" asp-action="Index" class="cancel-btn">
+                    <i class="fa-solid fa-arrow-left"></i> Назад
+                </a>
+            </div>
+
+            @if (!string.IsNullOrEmpty(Model.Specifications))
+            {
+                <div class="product-details-specs">
+                    <h3><i class="fa-solid fa-list-check"></i> Характеристики</h3>
+                    <ul class="specs-list">
+                        @foreach (var spec in Model.Specifications.Split(';', StringSplitOptions.RemoveEmptyEntries))
+                        {
+                            var parts = spec.Split(':', 2);
+                            <li>
+                                @if (parts.Length == 2)
+                                {
+                                    <span class="spec-key">@parts[0].Trim()</span>
+                                    <span class="spec-val">@parts[1].Trim()</span>
+                                }
+                                else
+                                {
+                                    <span>@spec.Trim()</span>
+                                }
+                            </li>
+                        }
+                    </ul>
+                </div>
+            }
+
+        </div>
+    </div>
+
+</div>

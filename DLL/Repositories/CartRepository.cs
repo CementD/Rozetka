@@ -17,7 +17,29 @@ namespace DLL.Repositories
         {
             var cart = await _db.Carts
                 .Include(c => c.Items)
-                .ThenInclude(i => i.Product)
+                    .ThenInclude(i => i.Product)
+                        .ThenInclude(p => p.Category)
+                .FirstOrDefaultAsync(c => c.UserId == userId);
+
+            if (cart == null)
+            {
+                cart = new Cart { UserId = userId };
+                _db.Carts.Add(cart);
+                await _db.SaveChangesAsync();
+
+                cart = await _db.Carts
+                    .Include(c => c.Items)
+                        .ThenInclude(i => i.Product)
+                    .FirstAsync(c => c.UserId == userId);
+            }
+
+            return cart;
+        }
+
+        public async Task AddToCartAsync(string userId, int productId)
+        {
+            var cart = await _db.Carts
+                .Include(c => c.Items)
                 .FirstOrDefaultAsync(c => c.UserId == userId);
 
             if (cart == null)
@@ -27,12 +49,6 @@ namespace DLL.Repositories
                 await _db.SaveChangesAsync();
             }
 
-            return cart;
-        }
-
-        public async Task AddToCartAsync(string userId, int productId)
-        {
-            var cart = await GetUserCartAsync(userId);
             var item = cart.Items.FirstOrDefault(i => i.ProductId == productId);
 
             if (item != null)

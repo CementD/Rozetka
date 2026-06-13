@@ -19,7 +19,8 @@
             <i class="fa-solid fa-box-open empty-icon"></i>
             <h2>Замовлень ще немає</h2>
             <p>Оформте перше замовлення в нашому каталозі</p>
-            <a asp-controller="Product" asp-action="Index" class="buy-btn" style="display:inline-flex;padding:14px 28px">
+            <a asp-controller="Product" asp-action="Index" class="buy-btn"
+               style="display:inline-flex;padding:14px 28px">
                 <i class="fa-solid fa-store"></i>&nbsp; До каталогу
             </a>
         </div>
@@ -36,35 +37,7 @@
                             Замовлення #@order.Id
                         </div>
                         <span class="td-status td-status-@(order.Status?.ToLower() ?? "")">
-                            @if (order.Status == "Created")
-                            {
-                                <text>Нове</text>
-                            }
-                            else if (order.Status == "InProcessing")
-                            {
-
-                                <text>В обробці</text>
-                            }
-                            else if (order.Status == "Shipped")
-                            {
-
-                                <text>Відправлено</text>
-                            }
-                            else if (order.Status == "Delivered")
-                            {
-
-                                <text>Доставлено</text>
-                            }
-                            else if (order.Status == "Canceled")
-                            {
-
-                                <text>Скасовано</text>
-                            }
-                            else
-                            {
-
-                                @(order.Status ?? "—")
-                            }
+                            @(order.Status ?? "—")
                         </span>
                     </div>
 
@@ -74,15 +47,35 @@
                             <span><i class="fa-solid fa-box"></i> @order.OrderItemsCount позицій</span>
                             <span class="td-price">@order.Total.ToString("N0") ₴</span>
                         </div>
+
+                        @if (order.Items != null && order.Items.Any())
+                        {
+                            <div class="order-card-products">
+                                @foreach (var item in order.Items.Take(3))
+                                {
+                                    <div class="order-mini-product" title="@item.ProductName">
+                                        <img src="@(string.IsNullOrEmpty(item.ProductImageUrl) ? "/images/phone.jpg" : item.ProductImageUrl)"
+                                             alt="@item.ProductName"
+                                             onerror="this.src='/images/phone.jpg'" />
+                                    </div>
+                                }
+                                @if (order.Items.Count > 3)
+                                {
+                                    <div class="order-mini-more">+@(order.Items.Count - 3)</div>
+                                }
+                            </div>
+                        }
                     </div>
 
                     <div class="order-card-footer">
-                        <a asp-controller="Order" asp-action="Details" asp-route-id="@order.Id" class="order-details-btn">
+                        <a asp-controller="Order" asp-action="Details"
+                           asp-route-id="@order.Id" class="order-details-btn">
                             <i class="fa-solid fa-circle-info"></i> Деталі замовлення
                         </a>
-                        @if (order.Status?.ToLower() is "pending" or "нова" or "new" or "created")
+                        @if (order.Status?.ToLower() is "created" or "pending" or "нова" or "new")
                         {
-                            <form asp-controller="Order" asp-action="Cancel" method="post" style="display:inline">
+                            <form asp-controller="Order" asp-action="Cancel"
+                                  method="post" style="display:inline">
                                 @Html.AntiForgeryToken()
                                 <input type="hidden" name="id" value="@order.Id" />
                                 <button type="submit" class="order-cancel-btn"

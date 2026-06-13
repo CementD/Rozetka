@@ -13,13 +13,37 @@ namespace Rozetka.Controllers
             _productService = productService;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string? search, string? category, string? sort)
         {
             var productsResult = await _productService.GetAllProductsAsync();
+            var products = productsResult.ToList();
 
-            var productsList = productsResult.ToList();
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                var s = search.Trim();
+                products = products.Where(p =>
+                    p.Name.Contains(s, StringComparison.OrdinalIgnoreCase) ||
+                    (!string.IsNullOrEmpty(p.Description) && p.Description.Contains(s, StringComparison.OrdinalIgnoreCase))
+                ).ToList();
+            }
 
-            var categories = productsList
+            if (!string.IsNullOrWhiteSpace(category))
+            {
+                products = products.Where(p =>
+                    p.CategoryName.Equals(category, StringComparison.OrdinalIgnoreCase)
+                ).ToList();
+            }
+
+            products = sort switch
+            {
+                "price_asc" => products.OrderBy(p => p.Price).ToList(),
+                "price_desc" => products.OrderByDescending(p => p.Price).ToList(),
+                "name" => products.OrderBy(p => p.Name).ToList(),
+                _ => products
+            };
+
+            var allProducts = await _productService.GetAllProductsAsync();
+            var categories = allProducts
                 .Where(p => !string.IsNullOrEmpty(p.CategoryName))
                 .Select(p => p.CategoryName)
                 .Distinct()
@@ -27,16 +51,17 @@ namespace Rozetka.Controllers
                 .ToList();
 
             ViewData["Categories"] = categories;
+            ViewData["Search"] = search;
+            ViewData["Category"] = category;
+            ViewData["Sort"] = sort;
 
-            return View(productsList);
+            return View(products);
         }
 
         public async Task<IActionResult> Details(int id)
         {
             var product = await _productService.GetProductByIdAsync(id);
-
             if (product == null) return NotFound();
-
             return View(product);
         }
     }

@@ -43,7 +43,7 @@
                     </div>
                     <div class="user-stat">
                         <span class="user-stat-val">
-                            @((Model.Orders?.Sum(o => (decimal?)0) ?? 0).ToString("N0")) ₴
+                            @((Model.Orders?.Sum(o => o.Total) ?? 0).ToString("N0")) ₴
                         </span>
                         <span class="user-stat-label">витрачено</span>
                     </div>
