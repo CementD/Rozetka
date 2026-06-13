@@ -76,6 +76,9 @@ namespace Rozetka.Controllers
                 PhoneNumber = model.PhoneNumber,
                 Address = model.Address
             };
+            registerDto.CardNumber = model.CardNumber;
+            registerDto.CardExpiry = model.CardExpiry;
+            registerDto.CardCvv = model.CardCvv;
 
             var success = await _userService.RegisterAsync(registerDto);
 

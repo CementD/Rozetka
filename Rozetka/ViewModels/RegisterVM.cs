@@ -23,5 +23,8 @@ namespace Rozetka.ViewModels
 
         [Required]
         public string Address { get; set; }
+        public string? CardNumber { get; set; }
+        public string? CardExpiry { get; set; }
+        public string? CardCvv { get; set; }
     }
 }

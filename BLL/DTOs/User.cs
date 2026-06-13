@@ -18,6 +18,9 @@ namespace BLL.DTOs
         public string Email { get; set; } = string.Empty;
         public string PhoneNumber { get; set; } = string.Empty;
         public string Address { get; set; } = string.Empty;
+        public string? CardNumber { get; set; }
+        public string? CardExpiry { get; set; }
+        public string? CardCvv { get; set; }
         public List<OrderReadDto> Orders { get; set; } = new();
     }
 
@@ -36,5 +39,9 @@ namespace BLL.DTOs
         public string LastName { get; set; } = string.Empty;
         public string PhoneNumber { get; set; } = string.Empty;
         public string Address { get; set; } = string.Empty;
+        // Optional payment info
+        public string? CardNumber { get; set; }
+        public string? CardExpiry { get; set; }
+        public string? CardCvv { get; set; }
     }
 }
