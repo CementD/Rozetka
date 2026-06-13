@@ -1,9 +1,9 @@
+using BLL;
 using Domain;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Rozetka.Controllers;
 using Rozetka.Data;
-using Rozetka.BLL.Repositories;
 
 namespace Rozetka
 {
@@ -13,22 +13,15 @@ namespace Rozetka
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-                ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-
-            builder.Services.AddDbContext<AppDbContext>(options =>
-                options.UseSqlServer(connectionString));
-
-            builder.Services.AddIdentity<User, IdentityRole>()
-                .AddEntityFrameworkStores<AppDbContext>()
-                .AddDefaultTokenProviders();
+            builder.Services.AddDataLayer(builder.Configuration);
 
             builder.Services.AddControllersWithViews();
-            builder.Services.AddScoped<IProductRepository, ProductRepository>();
-            builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
-            builder.Services.AddScoped<IOrderRepository, OrderRepository>();
-            builder.Services.AddScoped<IUserRepository, UserRepository>();
-            builder.Services.AddScoped<Rozetka.BLL.Repositories.ICartRepository, Rozetka.BLL.Repositories.CartRepository>();
+
+            builder.Services.AddRepositories();
+
+            builder.Services.AddServices();
+
+            builder.Services.AddHostedService<OrderStatusUpdaterBackgroundService>();
 
             var app = builder.Build();
 

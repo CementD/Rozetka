@@ -1,11 +1,11 @@
-using Domain;
+using BLL.DTOs;
 using System.Collections.Generic;
 
-namespace ViewModels
+namespace Rozetka.ViewModels
 {
     public class HomeViewModel
     {
-        public IEnumerable<Product> Products { get; set; }
-        public IEnumerable<Category> Categories { get; set; }
+        public IEnumerable<ProductReadDto> Products { get; set; }
+        public IEnumerable<CategoryReadDto> Categories { get; set; }
     }
 }

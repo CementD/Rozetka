@@ -1,35 +1,40 @@
 using System.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
-using Rozetka.Models;
-using Rozetka.BLL.Repositories;
 using System.Threading.Tasks;
-using ViewModels;
-
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using BLL;
+using Rozetka.Models;
+using Rozetka.ViewModels;
 
 namespace Rozetka.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly IProductRepository _productRepo;
-        private readonly ICategoryRepository _categoryRepo;
+        private readonly IProductService _productService;
+        private readonly ICategoryService _categoryService;
 
-        public HomeController(ILogger<HomeController> logger, IProductRepository productRepo, ICategoryRepository categoryRepo)
+        public HomeController(
+            ILogger<HomeController> logger,
+            IProductService productService,
+            ICategoryService categoryService)
         {
             _logger = logger;
-            _productRepo = productRepo;
-            _categoryRepo = categoryRepo;
+            _productService = productService;
+            _categoryService = categoryService;
         }
 
         public async Task<IActionResult> Index()
         {
-            var products = await _productRepo.GetAllAsync();
-            var categories = await _categoryRepo.GetAllAsync();
+            var productsDto = await _productService.GetAllProductsAsync();
+            var categoriesDto = await _categoryService.GetAllCategoriesAsync();
+
             var vm = new HomeViewModel
             {
-                Products = products,
-                Categories = categories
+                Products = productsDto,
+                Categories = categoriesDto
             };
+
             return View(vm);
         }
 

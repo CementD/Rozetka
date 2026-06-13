@@ -1,8 +1,10 @@
-﻿using Domain;
+﻿using System.Threading.Tasks;
+using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Rozetka.BLL.Repositories;
+using BLL;
+using BLL.DTOs;
 using Rozetka.ViewModels.Admin;
 
 namespace Rozetka.Controllers
@@ -10,29 +12,29 @@ namespace Rozetka.Controllers
     [Authorize(Roles = "Admin")]
     public class AdminController : Controller
     {
-        private readonly IProductRepository _productRepo;
-        private readonly ICategoryRepository _categoryRepo;
-        private readonly IUserRepository _userRepo;
-        private readonly IOrderRepository _orderRepo;
+        private readonly IProductService _productService;
+        private readonly ICategoryService _categoryService;
+        private readonly IUserService _userService;
+        private readonly IOrderService _orderService;
 
         public AdminController(
-            IProductRepository productRepo,
-            ICategoryRepository categoryRepo,
-            IUserRepository userRepo,
-            IOrderRepository orderRepo)
+            IProductService productService,
+            ICategoryService categoryService,
+            IUserService userService,
+            IOrderService orderService)
         {
-            _productRepo = productRepo;
-            _categoryRepo = categoryRepo;
-            _userRepo = userRepo;
-            _orderRepo = orderRepo;
+            _productService = productService;
+            _categoryService = categoryService;
+            _userService = userService;
+            _orderService = orderService;
         }
 
         public async Task<IActionResult> Index(string tab = "products")
         {
-            var products = await _productRepo.GetAllAsync();
-            var categories = await _categoryRepo.GetAllAsync();
-            var users = await _userRepo.GetAllAsync();
-            var orders = await _orderRepo.GetAllAsync();
+            var products = await _productService.GetAllProductsAsync();
+            var categories = await _categoryService.GetAllCategoriesAsync();
+            var users = await _userService.GetAllUsersAsync();
+            var orders = await _orderService.GetAllOrdersAsync();
 
             var model = new AdminIndexVM
             {
@@ -47,7 +49,7 @@ namespace Rozetka.Controllers
                     ImageUrl = p.ImageUrl,
                     Specifications = p.Specifications,
                     CategoryId = p.CategoryId,
-                    CategoryName = p.Category?.Name
+                    CategoryName = p.CategoryName
                 }).ToList(),
 
                 Categories = categories.Select(c => new CategoryVM
@@ -55,23 +57,25 @@ namespace Rozetka.Controllers
                     Id = c.Id,
                     Name = c.Name
                 }).ToList(),
+
                 Orders = orders.Select(o => new OrderVM
                 {
                     Id = o.Id,
                     OrderDate = o.OrderDate,
                     Status = o.Status,
                     UserId = o.UserId,
-                    UserName = o.User?.UserName,
-                    Total = o.OrderItems.Sum(i => i.UnitPrice * i.Quantity),
-                    OrderItemsCount = o.OrderItems.Count()
+                    UserName = o.UserName,
+                    Total = o.Total,
+                    OrderItemsCount = o.OrderItemsCount
                 }).ToList(),
+
                 Users = users.Select(u => new UserVM
                 {
                     Id = u.Id,
                     Email = u.Email,
-                    FullName = $"{u.FirstName} {u.LastName}",
+                    FullName = u.FullName,
                     PhoneNumber = u.PhoneNumber,
-                    OrdersCount = u.Orders?.Count ?? 0
+                    OrdersCount = u.OrdersCount
                 }).ToList(),
 
                 ProductsCount = products.Count(),
@@ -83,10 +87,9 @@ namespace Rozetka.Controllers
             return View(model);
         }
 
-
         public async Task<IActionResult> AddProduct()
         {
-            var categories = await _categoryRepo.GetAllAsync();
+            var categories = await _categoryService.GetAllCategoriesAsync();
 
             var model = new ProductCreateVM
             {
@@ -106,8 +109,7 @@ namespace Rozetka.Controllers
         {
             if (!ModelState.IsValid)
             {
-                var categories = await _categoryRepo.GetAllAsync();
-
+                var categories = await _categoryService.GetAllCategoriesAsync();
                 model.Categories = categories.Select(c => new SelectListItem
                 {
                     Value = c.Id.ToString(),
@@ -117,29 +119,29 @@ namespace Rozetka.Controllers
                 return View(model);
             }
 
-            var product = new Product
+            var dto = new ProductCreateDto
             {
                 Name = model.Name,
                 Description = model.Description,
                 Price = model.Price,
                 ImageUrl = model.ImageUrl,
                 Specifications = model.Specifications,
-                CategoryId = (int)model.CategoryId
+                CategoryId = model.CategoryId ?? 0
             };
 
-            await _productRepo.AddAsync(product);
+            await _productService.CreateProductAsync(dto);
 
             return RedirectToAction(nameof(Index), new { tab = "products" });
         }
 
         public async Task<IActionResult> EditProduct(int id)
         {
-            var product = await _productRepo.GetByIdAsync(id);
+            var product = await _productService.GetProductByIdAsync(id);
 
             if (product == null)
                 return NotFound();
 
-            var categories = await _categoryRepo.GetAllAsync();
+            var categories = await _categoryService.GetAllCategoriesAsync();
 
             var model = new ProductEditVM
             {
@@ -167,8 +169,7 @@ namespace Rozetka.Controllers
         {
             if (!ModelState.IsValid)
             {
-                var categories = await _categoryRepo.GetAllAsync();
-
+                var categories = await _categoryService.GetAllCategoriesAsync();
                 model.Categories = categories.Select(c => new SelectListItem
                 {
                     Value = c.Id.ToString(),
@@ -178,19 +179,18 @@ namespace Rozetka.Controllers
                 return View(model);
             }
 
-            var product = await _productRepo.GetByIdAsync(id);
+            var dto = new ProductUpdateDto
+            {
+                Id = id,
+                Name = model.Name,
+                Description = model.Description,
+                Price = model.Price,
+                ImageUrl = model.ImageUrl,
+                Specifications = model.Specifications,
+                CategoryId = model.CategoryId ?? 0
+            };
 
-            if (product == null)
-                return NotFound();
-
-            product.Name = model.Name;
-            product.Description = model.Description;
-            product.Price = model.Price;
-            product.ImageUrl = model.ImageUrl;
-            product.Specifications = model.Specifications;
-            product.CategoryId = (int)model.CategoryId;
-
-            await _productRepo.UpdateAsync(product);
+            await _productService.UpdateProductAsync(dto);
 
             return RedirectToAction(nameof(Index), new { tab = "products" });
         }
@@ -199,19 +199,18 @@ namespace Rozetka.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteProduct(int id)
         {
-            await _productRepo.DeleteAsync(id);
-
+            await _productService.DeleteProductAsync(id);
             return RedirectToAction(nameof(Index), new { tab = "products" });
         }
 
         public async Task<IActionResult> ProductDetails(int id)
         {
-            var product = await _productRepo.GetByIdAsync(id);
+            var product = await _productService.GetProductByIdAsync(id);
 
             if (product == null)
                 return NotFound();
 
-            var orders = await _productRepo.GetProductOrdersAsync(id);
+            var orders = await _productService.GetOrdersWithProductAsync(id);
 
             var model = new ProductDetailsVM
             {
@@ -221,7 +220,7 @@ namespace Rozetka.Controllers
                 Price = product.Price,
                 ImageUrl = product.ImageUrl,
                 Specifications = product.Specifications,
-                CategoryName = product.Category?.Name,
+                CategoryName = product.CategoryName,
 
                 OrdersCount = orders.Count,
                 Orders = orders.Select(o => new OrderMiniVM
@@ -235,7 +234,6 @@ namespace Rozetka.Controllers
             return View(model);
         }
 
-
         public IActionResult AddCategory()
         {
             return View();
@@ -248,20 +246,19 @@ namespace Rozetka.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            var category = new Category
+            var dto = new CategoryCreateDto
             {
                 Name = model.Name
             };
 
-            await _categoryRepo.AddAsync(category);
-            await _categoryRepo.SaveChangesAsync();
+            await _categoryService.CreateCategoryAsync(dto);
 
             return RedirectToAction(nameof(Index), new { tab = "categories" });
         }
 
         public async Task<IActionResult> EditCategory(int id)
         {
-            var category = await _categoryRepo.GetByIdAsync(id);
+            var category = await _categoryService.GetCategoryByIdAsync(id);
 
             if (category == null)
                 return NotFound();
@@ -280,15 +277,13 @@ namespace Rozetka.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            var category = await _categoryRepo.GetByIdAsync(model.Id);
+            var dto = new CategoryUpdateDto
+            {
+                Id = model.Id,
+                Name = model.Name
+            };
 
-            if (category == null)
-                return NotFound();
-
-            category.Name = model.Name;
-
-            _categoryRepo.Update(category);
-            await _categoryRepo.SaveChangesAsync();
+            await _categoryService.UpdateCategoryAsync(dto);
 
             return RedirectToAction(nameof(Index), new { tab = "categories" });
         }
@@ -297,31 +292,23 @@ namespace Rozetka.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteCategory(int id)
         {
-            var category = await _categoryRepo.GetByIdAsync(id);
-
-            if (category == null)
-                return NotFound();
-
-            _categoryRepo.Delete(category);
-            await _categoryRepo.SaveChangesAsync();
-
+            await _categoryService.DeleteCategoryAsync(id);
             return RedirectToAction(nameof(Index), new { tab = "categories" });
         }
+
         public async Task<IActionResult> CategoryDetails(int id)
         {
-            var category = await _categoryRepo.GetByIdAsync(id);
+            var category = await _categoryService.GetCategoryByIdAsync(id);
 
             if (category == null)
                 return NotFound();
-
-            var products = await _productRepo.GetProductsByCategoryIdAsync(id);
 
             var model = new CategoryDetailsVM
             {
                 Id = category.Id,
                 Name = category.Name,
 
-                Products = products.Select(p => new ProductVM
+                Products = category.Products.Select(p => new ProductVM
                 {
                     Id = p.Id,
                     Name = p.Name,
@@ -333,17 +320,9 @@ namespace Rozetka.Controllers
             return View(model);
         }
 
-        public IActionResult WhoAmI()
-        {
-            return Content(
-                $"User: {User.Identity?.Name}\n" +
-                $"Authenticated: {User.Identity?.IsAuthenticated}\n" +
-                $"IsAdmin: {User.IsInRole("Admin")}");
-        }
-
         public async Task<IActionResult> OrderDetails(int id)
         {
-            var order = _orderRepo.GetByIdWithDetailsAsync(id).Result;
+            var order = await _orderService.GetOrderByIdAsync(id);
 
             if (order == null)
                 return NotFound();
@@ -354,11 +333,11 @@ namespace Rozetka.Controllers
                 OrderDate = order.OrderDate,
                 Status = order.Status,
                 UserId = order.UserId,
-                UserName = order.User.UserName,
+                UserName = order.UserName,
 
-                Items = order.OrderItems.Select(i => new OrderItemVM
+                Items = order.Items.Select(i => new OrderItemVM
                 {
-                    ProductName = i.Product.Name,
+                    ProductName = i.ProductName,
                     ProductId = i.ProductId,
                     Quantity = i.Quantity,
                     UnitPrice = i.UnitPrice
@@ -368,9 +347,29 @@ namespace Rozetka.Controllers
             return View(model);
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateOrderStatus(int orderId, string status)
+        {
+            if (orderId <= 0 || string.IsNullOrEmpty(status))
+            {
+                return BadRequest("Некоректні дані замовлення");
+            }
+
+            var updateDto = new OrderUpdateStatusDto
+            {
+                Id = orderId,
+                Status = status
+            };
+
+            await _orderService.UpdateOrderStatusAsync(updateDto);
+
+            return RedirectToAction(nameof(OrderDetails), new { id = orderId });
+        }
+
         public async Task<IActionResult> UserDetails(string id)
         {
-            var user = await _userRepo.GetByIdWithOrdersAsync(id);
+            var user = await _userService.GetUserByIdAsync(id);
 
             if (user == null)
                 return NotFound();
@@ -379,7 +378,7 @@ namespace Rozetka.Controllers
             {
                 Id = user.Id,
                 Email = user.Email,
-                FullName = $"{user.FirstName} {user.LastName}",
+                FullName = user.FullName,
                 PhoneNumber = user.PhoneNumber,
                 Address = user.Address,
 
@@ -392,6 +391,14 @@ namespace Rozetka.Controllers
             };
 
             return View(model);
+        }
+
+        public IActionResult WhoAmI()
+        {
+            return Content(
+                $"User: {User.Identity?.Name}\n" +
+                $"Authenticated: {User.Identity?.IsAuthenticated}\n" +
+                $"IsAdmin: {User.IsInRole("Admin")}");
         }
     }
 }

@@ -1,19 +1,19 @@
 using System.Security.Claims;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Rozetka.BLL.Repositories;
-using System.Threading.Tasks;
+using BLL;
 
 namespace Rozetka.Controllers
 {
     [Authorize]
     public class OrderController : Controller
     {
-        private readonly IOrderRepository _orderRepo;
+        private readonly IOrderService _orderService;
 
-        public OrderController(IOrderRepository orderRepo)
+        public OrderController(IOrderService orderService)
         {
-            _orderRepo = orderRepo;
+            _orderService = orderService;
         }
 
         private string GetUserId()
@@ -24,14 +24,18 @@ namespace Rozetka.Controllers
         public async Task<IActionResult> Index()
         {
             var userId = GetUserId();
-            var orders = await _orderRepo.GetByUserIdAsync(userId);
-            return View(orders);
+
+            var orders = await _orderService.GetOrdersByUserAsync(userId);
+
+            return View(orders.ToList());
         }
 
         public async Task<IActionResult> Details(int id)
         {
-            var order = await _orderRepo.GetByIdWithDetailsAsync(id);
+            var order = await _orderService.GetOrderByIdAsync(id);
+
             if (order == null) return NotFound();
+
             return View(order);
         }
 
@@ -40,8 +44,11 @@ namespace Rozetka.Controllers
         public async Task<IActionResult> Create()
         {
             var userId = GetUserId();
-            var order = await _orderRepo.AddOrderFromCartAsync(userId);
+
+            var order = await _orderService.CreateOrderFromCartAsync(userId);
+
             if (order == null) return RedirectToAction("Index", "Cart");
+
             return RedirectToAction("Details", new { id = order.Id });
         }
 
@@ -49,7 +56,7 @@ namespace Rozetka.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Cancel(int id)
         {
-            await _orderRepo.CancelOrderAsync(id);
+            await _orderService.CancelOrderAsync(id);
             return RedirectToAction("Index");
         }
     }

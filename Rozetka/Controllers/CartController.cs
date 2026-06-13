@@ -1,39 +1,43 @@
 using System.Security.Claims;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Rozetka.BLL.Repositories;
-using System.Threading.Tasks;
+using BLL;
 
 namespace Rozetka.Controllers
 {
     [Authorize]
     public class CartController : Controller
     {
-        private readonly ICartRepository _cartRepo;
+        private readonly ICartService _cartService;
 
-        public CartController(ICartRepository cartRepo)
+        public CartController(ICartService cartService)
         {
-            _cartRepo = cartRepo;
+            _cartService = cartService;
         }
 
-        private string GetUserId()
-        {
-            return User.FindFirstValue(ClaimTypes.NameIdentifier);
-        }
+        private string GetUserId() =>
+            User.FindFirstValue(ClaimTypes.NameIdentifier);
 
         public async Task<IActionResult> Index()
         {
-            var userId = GetUserId();
-            var cart = await _cartRepo.GetUserCartAsync(userId);
-            return View(cart);
+            var cartDto = await _cartService.GetCartByUserIdAsync(GetUserId());
+            return View(cartDto);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddToCart(int productId)
         {
-            var userId = GetUserId();
-            await _cartRepo.AddToCartAsync(userId, productId);
+            await _cartService.AddToCartAsync(GetUserId(), productId);
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateQuantity(int cartItemId, int delta)
+        {
+            await _cartService.UpdateQuantityAsync(cartItemId, delta);
             return RedirectToAction("Index");
         }
 
@@ -41,7 +45,7 @@ namespace Rozetka.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> RemoveItem(int cartItemId)
         {
-            await _cartRepo.RemoveItemAsync(cartItemId);
+            await _cartService.RemoveItemAsync(cartItemId);
             return RedirectToAction("Index");
         }
 
@@ -49,8 +53,7 @@ namespace Rozetka.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ClearCart()
         {
-            var userId = GetUserId();
-            await _cartRepo.ClearCartAsync(userId);
+            await _cartService.ClearCartAsync(GetUserId());
             return RedirectToAction("Index");
         }
     }

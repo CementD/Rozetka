@@ -1,14 +1,13 @@
 using Domain;
-using Domain;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
 using System.Threading.Tasks;
 
-namespace Rozetka.BLL.Repositories
+namespace DLL.Repositories
 {
     public class CartRepository : ICartRepository
     {
         private readonly AppDbContext _db;
+
         public CartRepository(AppDbContext db)
         {
             _db = db;
@@ -35,15 +34,24 @@ namespace Rozetka.BLL.Repositories
         {
             var cart = await GetUserCartAsync(userId);
             var item = cart.Items.FirstOrDefault(i => i.ProductId == productId);
+
             if (item != null)
-            {
                 item.Quantity += 1;
-            }
             else
-            {
-                item = new CartItem { ProductId = productId, Quantity = 1, CartId = cart.Id };
-                cart.Items.Add(item);
-            }
+                cart.Items.Add(new CartItem { ProductId = productId, Quantity = 1, CartId = cart.Id });
+
+            await _db.SaveChangesAsync();
+        }
+
+        public async Task UpdateQuantityAsync(int cartItemId, int delta)
+        {
+            var item = await _db.CartItems.FindAsync(cartItemId);
+            if (item == null) return;
+
+            item.Quantity += delta;
+
+            if (item.Quantity <= 0)
+                _db.CartItems.Remove(item);
 
             await _db.SaveChangesAsync();
         }
@@ -63,6 +71,7 @@ namespace Rozetka.BLL.Repositories
             var cart = await _db.Carts
                 .Include(c => c.Items)
                 .FirstOrDefaultAsync(c => c.UserId == userId);
+
             if (cart != null)
             {
                 _db.CartItems.RemoveRange(cart.Items);
