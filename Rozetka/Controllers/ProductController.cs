@@ -1,20 +1,19 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using BLL;
-using System.Security.Claims; // Нужен для ClaimTypes
+using System.Security.Claims;
 
 namespace Rozetka.Controllers
 {
     public class ProductController : Controller
     {
         private readonly IProductService _productService;
-        private readonly IFavoriteService _favoriteService; // ДОБАВИЛИ
+        private readonly IFavoriteService _favoriteService;
 
-        // Обновили конструктор
         public ProductController(IProductService productService, IFavoriteService favoriteService)
         {
             _productService = productService;
-            _favoriteService = favoriteService; // ДОБАВИЛИ
+            _favoriteService = favoriteService; 
         }
 
         public async Task<IActionResult> Index(string? search, string? category, string? sort)
@@ -54,21 +53,17 @@ namespace Rozetka.Controllers
                 .OrderBy(c => c)
                 .ToList();
 
-            // --- ЛОГИКА ИЗБРАННОГО (НАЧАЛО) ---
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (!string.IsNullOrEmpty(userId))
             {
-                // Получаем список того, что лайкнул юзер
                 var userFavorites = await _favoriteService.GetUserFavoritesAsync(userId);
                 
-                // Превращаем в HashSet из ID товаров для моментального поиска .Contains() во вьюшке
                 ViewBag.FavoriteProductIds = userFavorites.Select(f => f.ProductId).ToHashSet();
             }
             else
             {
                 ViewBag.FavoriteProductIds = new HashSet<int>();
             }
-            // --- ЛОГИКА ИЗБРАННОГО (КОНЕЦ) ---
 
             ViewData["Categories"] = categories;
             ViewData["Search"] = search;
@@ -83,7 +78,6 @@ namespace Rozetka.Controllers
             var product = await _productService.GetProductByIdAsync(id);
             if (product == null) return NotFound();
 
-            // Здесь тоже можно проверить на избранное для детальной страницы товара
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             bool isFavorite = false;
             if (!string.IsNullOrEmpty(userId))
