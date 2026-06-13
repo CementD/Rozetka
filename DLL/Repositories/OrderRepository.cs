@@ -75,7 +75,7 @@ namespace DLL.Repositories
             var order = new Order
             {
                 UserId = userId,
-                OrderDate = DateTime.UtcNow,
+                OrderDate = DateTime.Now,
                 Status = "Created"
             };
 
