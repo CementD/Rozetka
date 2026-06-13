@@ -29,7 +29,15 @@ namespace BLL
                 UserId = o.UserId,
                 UserName = o.User?.UserName ?? "Гість",
                 Total = o.OrderItems?.Sum(i => i.UnitPrice * i.Quantity) ?? 0m,
-                OrderItemsCount = o.OrderItems?.Count ?? 0
+                OrderItemsCount = o.OrderItems?.Count ?? 0,
+                Items = o.OrderItems?.Select(i => new OrderItemReadDto
+                {
+                    ProductId = i.ProductId,
+                    ProductName = i.Product?.Name ?? "Товар видалено",
+                    ProductImageUrl = i.Product?.ImageUrl ?? string.Empty,
+                    Quantity = i.Quantity,
+                    UnitPrice = i.UnitPrice
+                }).ToList() ?? new()
             });
         }
 
@@ -51,6 +59,7 @@ namespace BLL
                 {
                     ProductId = i.ProductId,
                     ProductName = i.Product?.Name ?? "Товар видалено",
+                    ProductImageUrl = i.Product?.ImageUrl ?? string.Empty,
                     Quantity = i.Quantity,
                     UnitPrice = i.UnitPrice
                 }).ToList()
@@ -69,8 +78,16 @@ namespace BLL
                 OrderDate = o.OrderDate,
                 Status = o.Status,
                 UserId = o.UserId,
-                Total = o.OrderItems.Sum(i => i.UnitPrice * i.Quantity),
-                OrderItemsCount = o.OrderItems.Count
+                Total = o.OrderItems?.Sum(i => i.UnitPrice * i.Quantity) ?? 0m,
+                OrderItemsCount = o.OrderItems?.Count ?? 0,
+                Items = o.OrderItems?.Select(i => new OrderItemReadDto
+                {
+                    ProductId = i.ProductId,
+                    ProductName = i.Product?.Name ?? "Товар видалено",
+                    ProductImageUrl = i.Product?.ImageUrl ?? string.Empty,
+                    Quantity = i.Quantity,
+                    UnitPrice = i.UnitPrice
+                }).ToList() ?? new()
             });
         }
 
@@ -90,6 +107,8 @@ namespace BLL
                 Items = newOrder.OrderItems.Select(i => new OrderItemReadDto
                 {
                     ProductId = i.ProductId,
+                    ProductName = i.Product?.Name ?? string.Empty,
+                    ProductImageUrl = i.Product?.ImageUrl ?? string.Empty,
                     Quantity = i.Quantity,
                     UnitPrice = i.UnitPrice
                 }).ToList()
