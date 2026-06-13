@@ -1,8 +1,8 @@
 ﻿@model Rozetka.ViewModels.HomeViewModel
 @{
     ViewData["Title"] = "ROZETKA";
-    var topProducts = Model.Products?.Take(8).ToList() ?? new List<Domain.Product>();
-    var categories = Model.Categories?.ToList() ?? new List<Domain.Category>();
+    var topProducts = Model.Products?.Take(8).ToList() ?? new List<BLL.DTOs.ProductReadDto>();
+    var categories = Model.Categories?.ToList() ?? new List<BLL.DTOs.CategoryReadDto>();
 }
 
 @await Html.PartialAsync("_Header")

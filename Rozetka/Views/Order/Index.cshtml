@@ -1,4 +1,4 @@
-@model List<Domain.Order>
+@model List<BLL.DTOs.OrderReadDto>
 @{
     ViewData["Title"] = "Мої замовлення";
 }
@@ -29,7 +29,6 @@
         <div class="orders-list">
             @foreach (var order in Model.OrderByDescending(o => o.OrderDate))
             {
-                var total = order.OrderItems?.Sum(i => i.UnitPrice * i.Quantity) ?? 0;
                 <div class="order-card">
                     <div class="order-card-header">
                         <div class="order-card-id">
@@ -37,40 +36,51 @@
                             Замовлення #@order.Id
                         </div>
                         <span class="td-status td-status-@(order.Status?.ToLower() ?? "")">
-                            @(order.Status ?? "—")
+                            @if (order.Status == "Created")
+                            {
+                                <text>Нове</text>
+                            }
+                            else if (order.Status == "InProcessing")
+                            {
+
+                                <text>В обробці</text>
+                            }
+                            else if (order.Status == "Shipped")
+                            {
+
+                                <text>Відправлено</text>
+                            }
+                            else if (order.Status == "Delivered")
+                            {
+
+                                <text>Доставлено</text>
+                            }
+                            else if (order.Status == "Canceled")
+                            {
+
+                                <text>Скасовано</text>
+                            }
+                            else
+                            {
+
+                                @(order.Status ?? "—")
+                            }
                         </span>
                     </div>
 
                     <div class="order-card-body">
                         <div class="order-card-meta">
                             <span><i class="fa-regular fa-calendar"></i> @order.OrderDate.ToString("dd.MM.yyyy HH:mm")</span>
-                            <span><i class="fa-solid fa-box"></i> @(order.OrderItems?.Count ?? 0) позицій</span>
-                            <span class="td-price">@total.ToString("N0") ₴</span>
+                            <span><i class="fa-solid fa-box"></i> @order.OrderItemsCount позицій</span>
+                            <span class="td-price">@order.Total.ToString("N0") ₴</span>
                         </div>
-
-                        @if (order.OrderItems != null && order.OrderItems.Any())
-                        {
-                            <div class="order-card-products">
-                                @foreach (var item in order.OrderItems.Take(3))
-                                {
-                                    <div class="order-mini-product">
-                                        <img src="@(string.IsNullOrEmpty(item.Product?.ImageUrl) ? "/images/phone.jpg" : item.Product.ImageUrl)"
-                                             onerror="this.src='/images/phone.jpg'" />
-                                    </div>
-                                }
-                                @if (order.OrderItems.Count > 3)
-                                {
-                                    <div class="order-mini-more">+@(order.OrderItems.Count - 3)</div>
-                                }
-                            </div>
-                        }
                     </div>
 
                     <div class="order-card-footer">
                         <a asp-controller="Order" asp-action="Details" asp-route-id="@order.Id" class="order-details-btn">
                             <i class="fa-solid fa-circle-info"></i> Деталі замовлення
                         </a>
-                        @if (order.Status?.ToLower() is "pending" or "нова" or "new")
+                        @if (order.Status?.ToLower() is "pending" or "нова" or "new" or "created")
                         {
                             <form asp-controller="Order" asp-action="Cancel" method="post" style="display:inline">
                                 @Html.AntiForgeryToken()

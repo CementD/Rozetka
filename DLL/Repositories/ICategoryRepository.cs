@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Domain;
 
-namespace Rozetka.BLL.Repositories
+namespace DLL.Repositories
 {
     public interface ICategoryRepository
     {

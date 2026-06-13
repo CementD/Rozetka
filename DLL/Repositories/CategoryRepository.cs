@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Domain;
 using Microsoft.EntityFrameworkCore;
 
-namespace Rozetka.BLL.Repositories
+namespace DLL.Repositories
 {
     public class CategoryRepository : ICategoryRepository
     {
