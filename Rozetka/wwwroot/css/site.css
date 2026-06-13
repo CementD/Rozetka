@@ -2284,3 +2284,154 @@ a.home-product-card {
     a.home-product-card:hover {
         color: inherit;
     }
+
+
+/* CHECKOUT */
+
+.checkout-layout {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 24px;
+    align-items: flex-start;
+}
+
+.checkout-form-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.checkout-section {
+    background: white;
+    border-radius: 14px;
+    border: 1px solid #e5e7eb;
+    padding: 28px;
+}
+
+.checkout-section-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0 0 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #111827;
+}
+
+/* Картка-превью */
+.card-preview {
+    background: linear-gradient(135deg, #1f2937, #374151);
+    border-radius: 14px;
+    padding: 24px;
+    color: white;
+    position: relative;
+    height: 160px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 8px 24px rgba(0,0,0,.2);
+}
+
+.card-preview-chip {
+    font-size: 24px;
+    opacity: .7;
+}
+
+.card-preview-number {
+    font-size: 20px;
+    font-family: monospace;
+    letter-spacing: 3px;
+    font-weight: 600;
+}
+
+.card-preview-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    opacity: .8;
+}
+
+.card-preview-brand {
+    font-size: 32px;
+    opacity: .9;
+}
+
+/* Summary items */
+.checkout-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+    .checkout-item:last-child {
+        border-bottom: none;
+    }
+
+    .checkout-item img {
+        width: 48px;
+        height: 48px;
+        object-fit: contain;
+        border-radius: 8px;
+        border: 1px solid #e5e7eb;
+        background: #f9fafb;
+        flex-shrink: 0;
+    }
+
+.checkout-item-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.checkout-item-name {
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.checkout-item-qty {
+    font-size: 13px;
+    color: #9ca3af;
+}
+
+.checkout-item-price {
+    font-weight: 700;
+    color: #f84147;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+.checkout-loading {
+    text-align: center;
+    padding: 20px;
+    color: #9ca3af;
+}
+
+.checkout-secure {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    color: #6b7280;
+    font-size: 13px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #f3f4f6;
+}
+
+    .checkout-secure i {
+        color: #00a046;
+    }
+
+@media (max-width: 900px) {
+    .checkout-layout {
+        grid-template-columns: 1fr;
+    }
+}

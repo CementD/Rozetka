@@ -56,5 +56,12 @@ namespace Rozetka.Controllers
             await _cartService.ClearCartAsync(GetUserId());
             return RedirectToAction("Index");
         }
+
+        [HttpGet]
+        public async Task<IActionResult> SummaryJson()
+        {
+            var cartDto = await _cartService.GetCartByUserIdAsync(GetUserId());
+            return Json(cartDto);
+        }
     }
 }
