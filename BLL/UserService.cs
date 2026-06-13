@@ -53,6 +53,9 @@ namespace BLL
                 FullName = $"{user.FirstName} {user.LastName}".Trim(),
                 PhoneNumber = user.PhoneNumber ?? string.Empty,
                 Address = user.Address ?? string.Empty,
+                CardNumber = user.CardNumber,
+                CardExpiry = user.CardExpiry,
+                CardCvv = user.CardCvv,
                 Orders = user.Orders?.Select(o => new OrderReadDto
                 {
                     Id = o.Id,
@@ -78,6 +81,10 @@ namespace BLL
                 Address = dto.Address
             };
 
+            user.CardNumber = dto.CardNumber;
+            user.CardExpiry = dto.CardExpiry;
+            user.CardCvv = dto.CardCvv;
+
             var result = await _userManager.CreateAsync(user, dto.Password);
 
             if (result.Succeeded)
@@ -89,6 +96,20 @@ namespace BLL
             }
 
             return false;
+        }
+
+        public async Task UpdatePaymentInfoAsync(string userId, string? cardNumber, string? cardExpiry, string? cardCvv)
+        {
+            if (string.IsNullOrEmpty(userId)) return;
+
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null) return;
+
+            user.CardNumber = cardNumber;
+            user.CardExpiry = cardExpiry;
+            user.CardCvv = cardCvv;
+
+            await _userManager.UpdateAsync(user);
         }
 
         public async Task<bool> LoginAsync(UserLoginDto dto)

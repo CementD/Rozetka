@@ -10,10 +10,12 @@ namespace Rozetka.Controllers
     public class OrderController : Controller
     {
         private readonly IOrderService _orderService;
+        private readonly IUserService _userService;
 
-        public OrderController(IOrderService orderService)
+        public OrderController(IOrderService orderService, IUserService userService)
         {
             _orderService = orderService;
+            _userService = userService;
         }
 
         private string GetUserId()
@@ -43,8 +45,34 @@ namespace Rozetka.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create()
         {
+            return RedirectToAction("Checkout");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Checkout()
+        {
+            var userId = GetUserId();
+            var user = await _userService.GetUserByIdAsync(userId);
+
+            var vm = new ViewModels.CheckoutVM
+            {
+                CardNumber = user?.CardNumber,
+                CardExpiry = user?.CardExpiry,
+                CardCvv = user?.CardCvv
+            };
+
+            return View(vm);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Checkout(ViewModels.CheckoutVM model)
+        {
+            if (!ModelState.IsValid) return View(model);
+
             var userId = GetUserId();
 
+            await _userService.UpdatePaymentInfoAsync(userId, model.CardNumber, model.CardExpiry, model.CardCvv);
             var order = await _orderService.CreateOrderFromCartAsync(userId);
 
             if (order == null) return RedirectToAction("Index", "Cart");
