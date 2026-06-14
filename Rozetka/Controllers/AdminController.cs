@@ -394,6 +394,31 @@ namespace Rozetka.Controllers
             return View(model);
         }
 
+        public async Task<IActionResult> PendingShops()
+        {
+            await Task.CompletedTask;
+            var empty = new System.Collections.Generic.List<string>();
+            return View(empty);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ApproveShop(int id)
+        {
+            if (id <= 0)
+                return BadRequest();
+
+            await Task.CompletedTask;
+
+            return RedirectToAction(nameof(PendingShops));
+        }
+
+        public async Task<IActionResult> ExistingShops()
+        {
+            await Task.CompletedTask;
+            var empty = new System.Collections.Generic.List<string>();
+            return View(empty);
+        }
+
         public IActionResult WhoAmI()
         {
             return Content(

@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using BLL;
@@ -34,6 +35,8 @@ namespace Rozetka.Controllers
                 Products = productsDto,
                 Categories = categoriesDto
             };
+
+            vm.Stores = new List<string>();
 
             return View(vm);
         }
