@@ -19,6 +19,9 @@
         <div class="header-actions">
             @if (SignInManager.IsSignedIn(User))
             {
+                <a asp-controller="Shop" asp-action="Index" class="header-icon-btn" title="Мій магазин">
+                    <i class="fa-solid fa-shop"></i>
+                </a>
                 <a asp-controller="Order" asp-action="Index" class="header-icon-btn" title="Мої замовлення">
                     <i class="fa-solid fa-box"></i>
                 </a>

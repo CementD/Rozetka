@@ -11,6 +11,7 @@
             <a asp-action="Index" asp-route-tab="categories" class="admin-nav-link"><i class="fa-solid fa-list"></i> Категорії</a>
             <a asp-action="Index" asp-route-tab="orders" class="admin-nav-link"><i class="fa-solid fa-cart-shopping"></i> Замовлення</a>
             <a asp-action="Index" asp-route-tab="users" class="admin-nav-link"><i class="fa-solid fa-users"></i> Користувачі</a>
+            <a asp-action="Index" asp-route-tab="shops" class="admin-nav-link"><i class="fa-solid fa-shop"></i> Магазини</a>
         </nav>
         <div class="admin-sidebar-footer">
             <a asp-controller="Home" asp-action="Index" class="admin-nav-link"><i class="fa-solid fa-arrow-left"></i> На сайт</a>
@@ -47,6 +48,19 @@
                     <a asp-action="CategoryDetails" asp-route-id="@Model.CategoryId" class="details-link">
                         <i class="fa-solid fa-list"></i> @(Model.CategoryName ?? "—")
                     </a>
+                </div>
+                <div class="details-row">
+                    <span class="details-label">Магазин</span>
+                    @if (Model.ShopId.HasValue)
+                    {
+                        <span class="td-badge"><i class="fa-solid fa-shop"></i> @(Model.ShopName ?? "—")</span>
+                    }
+                    else
+                    {
+                        <span class="td-badge" style="background:#dcfce7;color:#166534">
+                            <i class="fa-solid fa-r"></i> Rozetka
+                        </span>
+                    }
                 </div>
                 <div class="details-row">
                     <span class="details-label">Ціна</span>
@@ -95,14 +109,7 @@
             else
             {
                 <table class="admin-table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Дата</th>
-                            <th>Статус</th>
-                            <th>Дії</th>
-                        </tr>
-                    </thead>
+                    <thead><tr><th>ID</th><th>Дата</th><th>Статус</th><th>Дії</th></tr></thead>
                     <tbody>
                         @foreach (var order in Model.Orders)
                         {
@@ -110,11 +117,7 @@
                                 <td class="td-id">#@order.Id</td>
                                 <td>@order.OrderDate.ToString("dd.MM.yyyy HH:mm")</td>
                                 <td><span class="td-status td-status-@(order.Status?.ToLower() ?? "")">@(order.Status ?? "—")</span></td>
-                                <td>
-                                    <a asp-action="OrderDetails" asp-route-id="@order.Id" class="info-btn" title="Деталі">
-                                        <i class="fa-solid fa-circle-info"></i>
-                                    </a>
-                                </td>
+                                <td><a asp-action="OrderDetails" asp-route-id="@order.Id" class="info-btn"><i class="fa-solid fa-circle-info"></i></a></td>
                             </tr>
                         }
                     </tbody>

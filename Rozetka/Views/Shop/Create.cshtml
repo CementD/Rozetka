@@ -1,0 +1,69 @@
+﻿@{
+    ViewData["Title"] = "Відкрити магазин";
+}
+
+@await Html.PartialAsync("_Header")
+
+<div class="page-layout">
+    <div class="page-header">
+        <div>
+            <h1><i class="fa-solid fa-shop"></i> Відкрити магазин</h1>
+            <p class="page-sub">Заповніть заявку — адміністратор розгляне її та підтвердить</p>
+        </div>
+        <a asp-action="Index" class="cancel-btn">
+            <i class="fa-solid fa-arrow-left"></i> Назад
+        </a>
+    </div>
+
+    <div style="max-width:600px">
+        <div class="form-card">
+
+            <div class="shop-create-hero">
+                <i class="fa-solid fa-shop"></i>
+                <h2>Як це працює?</h2>
+                <div class="shop-steps">
+                    <div class="shop-step">
+                        <span class="shop-step-num">1</span>
+                        <span>Заповніть форму нижче</span>
+                    </div>
+                    <div class="shop-step">
+                        <span class="shop-step-num">2</span>
+                        <span>Адміністратор перевірить заявку</span>
+                    </div>
+                    <div class="shop-step">
+                        <span class="shop-step-num">3</span>
+                        <span>Після підтвердження ви зможете додавати товари</span>
+                    </div>
+                </div>
+            </div>
+
+            <form asp-action="Create" method="post">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="All" class="text-danger admin-validation"></div>
+
+                <div class="form-group">
+                    <label for="name"><i class="fa-solid fa-shop"></i> Назва магазину</label>
+                    <input type="text" id="name" name="name" class="form-input"
+                           placeholder="Наприклад: TechStore UA" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="description"><i class="fa-solid fa-align-left"></i> Опис магазину</label>
+                    <textarea id="description" name="description" class="form-input" rows="4"
+                              placeholder="Розкажіть про свій магазин, що продаєте, умови..."></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="save-btn">
+                        <i class="fa-solid fa-paper-plane"></i> Подати заявку
+                    </button>
+                    <a asp-action="Index" class="cancel-btn">Скасувати</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

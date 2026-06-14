@@ -16,17 +16,20 @@ namespace Rozetka.Controllers
         private readonly ICategoryService _categoryService;
         private readonly IUserService _userService;
         private readonly IOrderService _orderService;
+        private readonly IShopService _shopService;
 
         public AdminController(
             IProductService productService,
             ICategoryService categoryService,
             IUserService userService,
-            IOrderService orderService)
+            IOrderService orderService,
+            IShopService shopService)
         {
             _productService = productService;
             _categoryService = categoryService;
             _userService = userService;
             _orderService = orderService;
+            _shopService = shopService;
         }
 
         public async Task<IActionResult> Index(string tab = "products")
@@ -35,6 +38,7 @@ namespace Rozetka.Controllers
             var categories = await _categoryService.GetAllCategoriesAsync();
             var users = await _userService.GetAllUsersAsync();
             var orders = await _orderService.GetAllOrdersAsync();
+            var pendingShops = await _shopService.GetPendingShopsAsync();
 
             var model = new AdminIndexVM
             {
@@ -78,120 +82,81 @@ namespace Rozetka.Controllers
                     OrdersCount = u.OrdersCount
                 }).ToList(),
 
+                PendingShops = pendingShops.ToList(),
+
                 ProductsCount = products.Count(),
                 CategoriesCount = categories.Count(),
                 OrdersCount = orders.Count(),
                 UsersCount = users.Count(),
+                PendingCount = pendingShops.Count()
             };
 
             return View(model);
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ApproveShop(int id)
+        {
+            await _shopService.ApproveShopAsync(id);
+            return RedirectToAction(nameof(Index), new { tab = "shops" });
+        }
+
         public async Task<IActionResult> AddProduct()
         {
-            var categories = await _categoryService.GetAllCategoriesAsync();
-
-            var model = new ProductCreateVM
-            {
-                Categories = categories.Select(c => new SelectListItem
-                {
-                    Value = c.Id.ToString(),
-                    Text = c.Name
-                }).ToList()
-            };
-
-            return View(model);
+            await LoadCategories();
+            return View(new ProductCreateVM());
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddProduct(ProductCreateVM model)
         {
-            if (!ModelState.IsValid)
-            {
-                var categories = await _categoryService.GetAllCategoriesAsync();
-                model.Categories = categories.Select(c => new SelectListItem
-                {
-                    Value = c.Id.ToString(),
-                    Text = c.Name
-                }).ToList();
-
-                return View(model);
-            }
-
-            var dto = new ProductCreateDto
+            if (!ModelState.IsValid) { await LoadCategories(); return View(model); }
+            await _productService.CreateProductAsync(new ProductCreateDto
             {
                 Name = model.Name,
-                Description = model.Description,
+                Description = model.Description ?? "",
                 Price = model.Price,
-                ImageUrl = model.ImageUrl,
+                ImageUrl = model.ImageUrl ?? "",
                 Specifications = model.Specifications,
-                CategoryId = model.CategoryId ?? 0
-            };
-
-            await _productService.CreateProductAsync(dto);
-
+                CategoryId = (int)model.CategoryId
+            });
             return RedirectToAction(nameof(Index), new { tab = "products" });
         }
 
         public async Task<IActionResult> EditProduct(int id)
         {
-            var product = await _productService.GetProductByIdAsync(id);
-
-            if (product == null)
-                return NotFound();
-
-            var categories = await _categoryService.GetAllCategoriesAsync();
-
-            var model = new ProductEditVM
+            var p = await _productService.GetProductByIdAsync(id);
+            if (p == null) return NotFound();
+            await LoadCategories(p.CategoryId);
+            return View(new ProductEditVM
             {
-                Id = id,
-                Name = product.Name,
-                Description = product.Description,
-                Price = product.Price,
-                ImageUrl = product.ImageUrl,
-                Specifications = product.Specifications,
-                CategoryId = product.CategoryId,
-
-                Categories = categories.Select(c => new SelectListItem
-                {
-                    Value = c.Id.ToString(),
-                    Text = c.Name
-                }).ToList()
-            };
-
-            return View(model);
+                Id = p.Id,
+                Name = p.Name,
+                Description = p.Description,
+                Price = p.Price,
+                ImageUrl = p.ImageUrl,
+                Specifications = p.Specifications,
+                CategoryId = p.CategoryId
+            });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditProduct(int id, ProductEditVM model)
         {
-            if (!ModelState.IsValid)
-            {
-                var categories = await _categoryService.GetAllCategoriesAsync();
-                model.Categories = categories.Select(c => new SelectListItem
-                {
-                    Value = c.Id.ToString(),
-                    Text = c.Name
-                }).ToList();
-
-                return View(model);
-            }
-
-            var dto = new ProductUpdateDto
+            if (!ModelState.IsValid) { await LoadCategories(model.CategoryId); return View(model); }
+            await _productService.UpdateProductAsync(new ProductUpdateDto
             {
                 Id = id,
                 Name = model.Name,
-                Description = model.Description,
+                Description = model.Description ?? "",
                 Price = model.Price,
-                ImageUrl = model.ImageUrl,
+                ImageUrl = model.ImageUrl ?? "",
                 Specifications = model.Specifications,
-                CategoryId = model.CategoryId ?? 0
-            };
-
-            await _productService.UpdateProductAsync(dto);
-
+                CategoryId = (int)model.CategoryId
+            });
             return RedirectToAction(nameof(Index), new { tab = "products" });
         }
 
@@ -205,23 +170,21 @@ namespace Rozetka.Controllers
 
         public async Task<IActionResult> ProductDetails(int id)
         {
-            var product = await _productService.GetProductByIdAsync(id);
-
-            if (product == null)
-                return NotFound();
-
+            var p = await _productService.GetProductByIdAsync(id);
+            if (p == null) return NotFound();
             var orders = await _productService.GetOrdersWithProductAsync(id);
-
-            var model = new ProductDetailsVM
+            var vm = new ProductDetailsVM
             {
-                Id = product.Id,
-                Name = product.Name,
-                Description = product.Description,
-                Price = product.Price,
-                ImageUrl = product.ImageUrl,
-                Specifications = product.Specifications,
-                CategoryName = product.CategoryName,
-
+                Id = p.Id,
+                Name = p.Name,
+                Description = p.Description,
+                Price = p.Price,
+                ImageUrl = p.ImageUrl,
+                Specifications = p.Specifications,
+                CategoryId = p.CategoryId,
+                CategoryName = p.CategoryName,
+                ShopId = p.ShopId,
+                ShopName = p.ShopName,
                 OrdersCount = orders.Count,
                 Orders = orders.Select(o => new OrderMiniVM
                 {
@@ -230,61 +193,33 @@ namespace Rozetka.Controllers
                     Status = o.Status
                 }).ToList()
             };
-
-            return View(model);
+            return View(vm);
         }
 
-        public IActionResult AddCategory()
-        {
-            return View();
-        }
+        public IActionResult AddCategory() => View(new CategoryVM());
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddCategory(CategoryVM model)
         {
-            if (!ModelState.IsValid)
-                return View(model);
-
-            var dto = new CategoryCreateDto
-            {
-                Name = model.Name
-            };
-
-            await _categoryService.CreateCategoryAsync(dto);
-
+            if (!ModelState.IsValid) return View(model);
+            await _categoryService.CreateCategoryAsync(new CategoryCreateDto { Name = model.Name });
             return RedirectToAction(nameof(Index), new { tab = "categories" });
         }
 
         public async Task<IActionResult> EditCategory(int id)
         {
-            var category = await _categoryService.GetCategoryByIdAsync(id);
-
-            if (category == null)
-                return NotFound();
-
-            return View(new CategoryVM
-            {
-                Id = category.Id,
-                Name = category.Name
-            });
+            var c = await _categoryService.GetCategoryByIdAsync(id);
+            if (c == null) return NotFound();
+            return View(new CategoryVM { Id = c.Id, Name = c.Name });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditCategory(CategoryVM model)
         {
-            if (!ModelState.IsValid)
-                return View(model);
-
-            var dto = new CategoryUpdateDto
-            {
-                Id = model.Id,
-                Name = model.Name
-            };
-
-            await _categoryService.UpdateCategoryAsync(dto);
-
+            if (!ModelState.IsValid) return View(model);
+            await _categoryService.UpdateCategoryAsync(new CategoryUpdateDto { Id = model.Id, Name = model.Name });
             return RedirectToAction(nameof(Index), new { tab = "categories" });
         }
 
@@ -298,133 +233,68 @@ namespace Rozetka.Controllers
 
         public async Task<IActionResult> CategoryDetails(int id)
         {
-            var category = await _categoryService.GetCategoryByIdAsync(id);
-
-            if (category == null)
-                return NotFound();
-
-            var model = new CategoryDetailsVM
+            var c = await _categoryService.GetCategoryByIdAsync(id);
+            if (c == null) return NotFound();
+            var products = await _productService.GetProductsByCategoryAsync(id);
+            return View(new CategoryDetailsVM
             {
-                Id = category.Id,
-                Name = category.Name,
-
-                Products = category.Products.Select(p => new ProductVM
+                Id = c.Id,
+                Name = c.Name,
+                Products = products.Select(p => new ProductVM
                 {
                     Id = p.Id,
                     Name = p.Name,
                     Price = p.Price,
                     ImageUrl = p.ImageUrl
                 }).ToList()
-            };
-
-            return View(model);
+            });
         }
 
         public async Task<IActionResult> OrderDetails(int id)
         {
-            var order = await _orderService.GetOrderByIdAsync(id);
-
-            if (order == null)
-                return NotFound();
-
-            var model = new OrderDetailsVM
+            var o = await _orderService.GetOrderByIdAsync(id);
+            if (o == null) return NotFound();
+            return View(new OrderDetailsVM
             {
-                Id = order.Id,
-                OrderDate = order.OrderDate,
-                Status = order.Status,
-                UserId = order.UserId,
-                UserName = order.UserName,
-
-                Items = order.Items.Select(i => new OrderItemVM
+                Id = o.Id,
+                OrderDate = o.OrderDate,
+                Status = o.Status,
+                UserId = o.UserId,
+                UserName = o.UserName,
+                Items = o.Items.Select(i => new OrderItemVM
                 {
                     ProductName = i.ProductName,
-                    ProductId = i.ProductId,
                     Quantity = i.Quantity,
                     UnitPrice = i.UnitPrice
                 }).ToList()
-            };
-
-            return View(model);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateOrderStatus(int orderId, string status)
-        {
-            if (orderId <= 0 || string.IsNullOrEmpty(status))
-            {
-                return BadRequest("Некоректні дані замовлення");
-            }
-
-            var updateDto = new OrderUpdateStatusDto
-            {
-                Id = orderId,
-                Status = status
-            };
-
-            await _orderService.UpdateOrderStatusAsync(updateDto);
-
-            return RedirectToAction(nameof(OrderDetails), new { id = orderId });
+            });
         }
 
         public async Task<IActionResult> UserDetails(string id)
         {
-            var user = await _userService.GetUserByIdAsync(id);
-
-            if (user == null)
-                return NotFound();
-
-            var model = new UserDetailsVM
+            var u = await _userService.GetUserByIdAsync(id);
+            if (u == null) return NotFound();
+            return View(new UserDetailsVM
             {
-                Id = user.Id,
-                Email = user.Email,
-                FullName = user.FullName,
-                PhoneNumber = user.PhoneNumber,
-                Address = user.Address,
-
-                Orders = user.Orders.Select(o => new OrderMiniVM
+                Id = u.Id,
+                FullName = u.FullName,
+                Email = u.Email,
+                PhoneNumber = u.PhoneNumber,
+                Address = u.Address,
+                Orders = u.Orders.Select(o => new OrderMiniVM
                 {
                     Id = o.Id,
                     OrderDate = o.OrderDate,
                     Status = o.Status,
                     Total = o.Total
                 }).ToList()
-            };
-
-            return View(model);
+            });
         }
 
-        public async Task<IActionResult> PendingShops()
+        private async Task LoadCategories(int? selectedId = null)
         {
-            await Task.CompletedTask;
-            var empty = new System.Collections.Generic.List<string>();
-            return View(empty);
-        }
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ApproveShop(int id)
-        {
-            if (id <= 0)
-                return BadRequest();
-
-            await Task.CompletedTask;
-
-            return RedirectToAction(nameof(PendingShops));
-        }
-
-        public async Task<IActionResult> ExistingShops()
-        {
-            await Task.CompletedTask;
-            var empty = new System.Collections.Generic.List<string>();
-            return View(empty);
-        }
-
-        public IActionResult WhoAmI()
-        {
-            return Content(
-                $"User: {User.Identity?.Name}\n" +
-                $"Authenticated: {User.Identity?.IsAuthenticated}\n" +
-                $"IsAdmin: {User.IsInRole("Admin")}");
+            var cats = await _categoryService.GetAllCategoriesAsync();
+            ViewBag.Categories = new SelectList(cats, "Id", "Name", selectedId);
         }
     }
 }

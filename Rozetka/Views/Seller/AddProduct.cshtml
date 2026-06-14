@@ -1,0 +1,77 @@
+﻿@model Rozetka.ViewModels.Admin.ProductCreateVM
+@{
+    ViewData["Title"] = "Додати товар";
+}
+
+@await Html.PartialAsync("_Header")
+
+<div class="page-layout">
+    <div class="page-header">
+        <div>
+            <h1><i class="fa-solid fa-plus"></i> Додати товар</h1>
+            <p class="page-sub">Заповніть інформацію про товар</p>
+        </div>
+        <a asp-controller="Shop" asp-action="Index" class="cancel-btn">
+            <i class="fa-solid fa-arrow-left"></i> Мій магазин
+        </a>
+    </div>
+
+    <div style="max-width:700px">
+        <div class="form-card">
+            <form asp-controller="Seller" asp-action="AddProduct" method="post">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="ModelOnly" class="text-danger admin-validation"></div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label asp-for="Name"><i class="fa-solid fa-tag"></i> Назва товару</label>
+                        <input asp-for="Name" class="form-input" placeholder="Наприклад: Samsung Galaxy S26" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Price"><i class="fa-solid fa-hryvnia-sign"></i> Ціна (₴)</label>
+                        <input asp-for="Price" type="number" step="0.01" min="0" class="form-input" placeholder="0.00" />
+                        <span asp-validation-for="Price" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="CategoryId"><i class="fa-solid fa-list"></i> Категорія</label>
+                    <select asp-for="CategoryId" asp-items="Model.Categories" class="form-input">
+                        <option value="">— Оберіть категорію —</option>
+                    </select>
+                    <span asp-validation-for="CategoryId" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Description"><i class="fa-solid fa-align-left"></i> Опис</label>
+                    <textarea asp-for="Description" class="form-input" rows="3"
+                              placeholder="Коротко про товар..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Specifications"><i class="fa-solid fa-list-check"></i> Характеристики</label>
+                    <textarea asp-for="Specifications" class="form-input" rows="3"
+                              placeholder="RAM: 16GB; CPU: Ryzen 5; Дисплей: 15.6"></textarea>
+                    <small style="color:#9ca3af">Розділяйте характеристики крапкою з комою ( ; )</small>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="ImageUrl"><i class="fa-solid fa-image"></i> URL зображення</label>
+                    <input asp-for="ImageUrl" class="form-input" placeholder="https://..." />
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="save-btn">
+                        <i class="fa-solid fa-floppy-disk"></i> Зберегти товар
+                    </button>
+                    <a asp-controller="Shop" asp-action="Index" class="cancel-btn">Скасувати</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
