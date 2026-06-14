@@ -1,31 +1,46 @@
 @model BLL.DTOs.ProductReadDto
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<Domain.User> SignInManager
 @{
     ViewData["Title"] = Model.Name;
+    bool isFav = ViewBag.IsFavorite as bool? ?? false;
+    bool isLoggedIn = SignInManager.IsSignedIn(User);
 }
 
 @await Html.PartialAsync("_Header")
 
 <div class="page-layout">
-
     <div class="product-details-grid">
 
-        <!-- Фото -->
         <div class="product-details-img-wrap">
             <img src="@(string.IsNullOrEmpty(Model.ImageUrl) ? "/images/phone.jpg" : Model.ImageUrl)"
                  alt="@Model.Name" onerror="this.src='/images/phone.jpg'" />
         </div>
 
-        <!-- Інфо -->
         <div class="product-details-info">
 
-            @if (!string.IsNullOrEmpty(Model.CategoryName))
-            {
-                <a asp-controller="Product" asp-action="Index"
-                   asp-route-category="@Model.CategoryName"
-                   class="product-details-category">
-                    <i class="fa-solid fa-list"></i> @Model.CategoryName
-                </a>
-            }
+            <div class="product-details-badges">
+                @if (!string.IsNullOrEmpty(Model.CategoryName))
+                {
+                    <a asp-controller="Product" asp-action="Index"
+                       asp-route-category="@Model.CategoryName"
+                       class="product-details-category">
+                        <i class="fa-solid fa-list"></i> @Model.CategoryName
+                    </a>
+                }
+                @if (!string.IsNullOrEmpty(Model.ShopName))
+                {
+                    <span class="product-details-shop">
+                        <i class="fa-solid fa-shop"></i> @Model.ShopName
+                    </span>
+                }
+                else
+                {
+                    <span class="product-details-shop product-details-shop-rozetka">
+                        <i class="fa-solid fa-store"></i> Rozetka
+                    </span>
+                }
+            </div>
 
             <h1 class="product-details-name">@Model.Name</h1>
 
@@ -46,8 +61,20 @@
                         <i class="fa-solid fa-cart-plus"></i> Додати до кошика
                     </button>
                 </form>
+
+                @if (isLoggedIn)
+                {
+                    <button type="button"
+                            class="fav-btn-lg @(isFav ? "fav-btn-lg-active" : "")"
+                            onclick="toggleFav(this, @Model.Id)"
+                            title="@(isFav ? "Видалити з обраного" : "Додати в обране")">
+                        <i class="@(isFav ? "fa-solid" : "fa-regular") fa-heart"></i>
+                        @(isFav ? "В обраному" : "В обране")
+                    </button>
+                }
+
                 <a asp-controller="Product" asp-action="Index" class="cancel-btn">
-                    <i class="fa-solid fa-arrow-left"></i> Назад
+                    <i class="fa-solid fa-arrow-left"></i>
                 </a>
             </div>
 
@@ -67,6 +94,7 @@
                                 }
                                 else
                                 {
+
                                     <span>@spec.Trim()</span>
                                 }
                             </li>
@@ -77,5 +105,4 @@
 
         </div>
     </div>
-
 </div>

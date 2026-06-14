@@ -1,10 +1,14 @@
 ﻿@model List<BLL.DTOs.ProductReadDto>
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<Domain.User> SignInManager
 @{
     ViewData["Title"] = "Каталог товарів";
-    var categories = ViewData["Categories"] as List<string> ?? new List<string>();
+    var categories = ViewData["Categories"] as List<string> ?? new();
     var currentCategory = ViewData["Category"] as string;
     var currentSearch = ViewData["Search"] as string;
     var currentSort = ViewData["Sort"] as string;
+    var favoriteIds = (ViewBag.FavoriteProductIds as HashSet<int>) ?? new HashSet<int>();
+    bool isLoggedIn = SignInManager.IsSignedIn(User);
 }
 
 @await Html.PartialAsync("_Header")
@@ -12,12 +16,10 @@
 <div class="catalog-layout">
 
     <aside class="catalog-sidebar">
-
         <div class="filter-section">
             <h4><i class="fa-solid fa-list"></i> Категорії</h4>
             <a asp-controller="Product" asp-action="Index"
-               asp-route-search="@currentSearch"
-               asp-route-sort="@currentSort"
+               asp-route-search="@currentSearch" asp-route-sort="@currentSort"
                class="filter-link @(string.IsNullOrEmpty(currentCategory) ? "active" : "")">
                 <i class="fa-solid fa-grip"></i> Всі товари
             </a>
@@ -27,44 +29,31 @@
                    asp-route-search="@currentSearch"
                    asp-route-category="@cat"
                    asp-route-sort="@currentSort"
-                   class="filter-link @(currentCategory == cat ? "active" : "")">
-                    @cat
-                </a>
+                   class="filter-link @(currentCategory == cat ? "active" : "")">@cat</a>
             }
         </div>
 
         <div class="filter-section">
             <h4><i class="fa-solid fa-arrow-up-wide-short"></i> Сортування</h4>
             <a asp-controller="Product" asp-action="Index"
-               asp-route-search="@currentSearch"
-               asp-route-category="@currentCategory"
-               asp-route-sort=""
-               class="filter-link @(string.IsNullOrEmpty(currentSort) ? "active" : "")">
-                За замовчуванням
-            </a>
+               asp-route-search="@currentSearch" asp-route-category="@currentCategory" asp-route-sort=""
+               class="filter-link @(string.IsNullOrEmpty(currentSort) ? "active" : "")">За замовчуванням</a>
             <a asp-controller="Product" asp-action="Index"
-               asp-route-search="@currentSearch"
-               asp-route-category="@currentCategory"
-               asp-route-sort="price_asc"
+               asp-route-search="@currentSearch" asp-route-category="@currentCategory" asp-route-sort="price_asc"
                class="filter-link @(currentSort == "price_asc" ? "active" : "")">
                 <i class="fa-solid fa-arrow-up"></i> Ціна: від дешевих
             </a>
             <a asp-controller="Product" asp-action="Index"
-               asp-route-search="@currentSearch"
-               asp-route-category="@currentCategory"
-               asp-route-sort="price_desc"
+               asp-route-search="@currentSearch" asp-route-category="@currentCategory" asp-route-sort="price_desc"
                class="filter-link @(currentSort == "price_desc" ? "active" : "")">
                 <i class="fa-solid fa-arrow-down"></i> Ціна: від дорогих
             </a>
             <a asp-controller="Product" asp-action="Index"
-               asp-route-search="@currentSearch"
-               asp-route-category="@currentCategory"
-               asp-route-sort="name"
+               asp-route-search="@currentSearch" asp-route-category="@currentCategory" asp-route-sort="name"
                class="filter-link @(currentSort == "name" ? "active" : "")">
                 <i class="fa-solid fa-arrow-down-a-z"></i> За назвою А–Я
             </a>
         </div>
-
     </aside>
 
     <main class="catalog-main">
@@ -80,11 +69,8 @@
                     @if (!string.IsNullOrEmpty(currentSearch))
                     {
                         <a asp-controller="Product" asp-action="Index"
-                           asp-route-category="@currentCategory"
-                           asp-route-sort="@currentSort"
-                           class="catalog-search-clear" title="Очистити">
-                            <i class="fa-solid fa-xmark"></i>
-                        </a>
+                           asp-route-category="@currentCategory" asp-route-sort="@currentSort"
+                           class="catalog-search-clear"><i class="fa-solid fa-xmark"></i></a>
                     }
                 </div>
                 <button type="submit" class="catalog-search-btn">Знайти</button>
@@ -96,9 +82,7 @@
                 <h1>@(string.IsNullOrEmpty(currentCategory) ? "Всі товари" : currentCategory)</h1>
                 @if (!string.IsNullOrEmpty(currentSearch))
                 {
-                    <span class="search-hint">
-                        <i class="fa-solid fa-magnifying-glass"></i> «@currentSearch»
-                    </span>
+                    <span class="search-hint"><i class="fa-solid fa-magnifying-glass"></i> «@currentSearch»</span>
                 }
                 <span class="product-count">@Model.Count товарів</span>
             </div>
@@ -110,16 +94,14 @@
             }
         </div>
 
-        @if (Model.Count == 0)
+        @if (!Model.Any())
         {
             <div class="empty-state">
                 <i class="fa-solid fa-magnifying-glass empty-icon"></i>
                 <h2>Товарів не знайдено</h2>
                 <p>Спробуйте змінити фільтри або пошуковий запит</p>
                 <a asp-controller="Product" asp-action="Index"
-                   class="buy-btn" style="display:inline-flex;padding:14px 28px">
-                    Показати всі товари
-                </a>
+                   class="buy-btn" style="display:inline-flex;padding:14px 28px">Показати всі товари</a>
             </div>
         }
         else
@@ -127,8 +109,8 @@
             <div class="product-grid">
                 @foreach (var product in Model)
                 {
-                    <a asp-controller="Product" asp-action="Details"
-                       asp-route-id="@product.Id" class="product-card">
+                    bool isFav = favoriteIds.Contains(product.Id);
+                    <div class="product-card" onclick="window.location='/Product/Details/@product.Id'">
                         @if (!string.IsNullOrEmpty(product.CategoryName))
                         {
                             <span class="card-category">@product.CategoryName</span>
@@ -139,26 +121,46 @@
                         </div>
                         <div class="card-body">
                             <h3>@product.Name</h3>
+                            @if (!string.IsNullOrEmpty(product.ShopName))
+                            {
+                                <span class="card-shop">
+                                    <i class="fa-solid fa-shop"></i> @product.ShopName
+                                </span>
+                            }
                             @if (!string.IsNullOrEmpty(product.Description))
                             {
                                 <p class="desc">@(product.Description.Length > 70 ? product.Description[..70] + "…" : product.Description)</p>
                             }
                             <div class="price">@product.Price.ToString("N0") <span class="currency">₴</span></div>
-                            <div class="card-actions">
-                                <form asp-controller="Cart" asp-action="AddToCart" method="post"
-                                      style="flex:1" onclick="event.stopPropagation()">
+                            <div class="card-actions" onclick="event.stopPropagation()">
+                                <form asp-controller="Cart" asp-action="AddToCart" method="post" style="flex:1">
                                     @Html.AntiForgeryToken()
                                     <input type="hidden" name="productId" value="@product.Id" />
                                     <button type="submit" class="buy-btn">
                                         <i class="fa-solid fa-cart-plus"></i> Купити
                                     </button>
                                 </form>
+                                @if (isLoggedIn)
+                                {
+                                    <button type="button"
+                                            class="fav-btn @(isFav ? "fav-btn-active" : "")"
+                                            onclick="event.stopPropagation(); toggleFav(this, @product.Id)"
+                                            title="@(isFav ? "Видалити з обраного" : "Додати в обране")">
+                                        <i class="@(isFav ? "fa-solid" : "fa-regular") fa-heart"></i>
+                                    </button>
+                                }
+                                else
+                                {
+                                    <a asp-controller="Account" asp-action="Login"
+                                       class="fav-btn" title="Увійдіть щоб додати в обране">
+                                        <i class="fa-regular fa-heart"></i>
+                                    </a>
+                                }
                             </div>
                         </div>
-                    </a>
+                    </div>
                 }
             </div>
         }
-
     </main>
 </div>

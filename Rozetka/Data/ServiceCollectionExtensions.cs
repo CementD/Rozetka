@@ -35,6 +35,7 @@ namespace Rozetka.Data
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<ICartRepository, CartRepository>();
             services.AddScoped<IFavoriteRepository, FavoriteRepository>();
+            services.AddScoped<IShopRepository, ShopRepository>();
 
             return services;
         }
@@ -44,9 +45,10 @@ namespace Rozetka.Data
             services.AddScoped<IProductService, ProductService>();
             services.AddScoped<ICartService, CartService>();
             services.AddScoped<ICategoryService, CategoryService>();
-            services.AddScoped<IOrderService,  OrderService>();
+            services.AddScoped<IOrderService, OrderService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IFavoriteService, FavoriteService>();
+            services.AddScoped<IShopService, ShopService>();
 
             return services;
         }

@@ -1,0 +1,115 @@
+﻿@model BLL.DTOs.ShopDto?
+@{
+    ViewData["Title"] = "Мій магазин";
+}
+
+@await Html.PartialAsync("_Header")
+
+<div class="page-layout">
+    <div class="page-header">
+        <h1><i class="fa-solid fa-shop"></i> Мій магазин</h1>
+    </div>
+
+    @if (Model == null)
+    {
+        <div class="shop-empty-wrap">
+            <div class="shop-empty-card">
+                <div class="shop-empty-icon">
+                    <i class="fa-solid fa-shop"></i>
+                </div>
+                <h2>У вас ще немає магазину</h2>
+                <p>Подайте заявку — після перевірки адміністратором ви зможете продавати товари на платформі</p>
+                <div class="shop-steps">
+                    <div class="shop-step">
+                        <span class="shop-step-num">1</span>
+                        <span>Заповніть форму заявки</span>
+                    </div>
+                    <div class="shop-step">
+                        <span class="shop-step-num">2</span>
+                        <span>Адміністратор перевірить і підтвердить</span>
+                    </div>
+                    <div class="shop-step">
+                        <span class="shop-step-num">3</span>
+                        <span>Додавайте товари та продавайте</span>
+                    </div>
+                </div>
+                <a asp-action="Create" class="order-btn" style="margin-top:28px;display:inline-flex;width:auto;padding:14px 32px">
+                    <i class="fa-solid fa-paper-plane"></i>&nbsp; Подати заявку
+                </a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="shop-dashboard">
+
+            <!-- Статус картка -->
+            <div class="shop-dashboard-card shop-dashboard-status">
+                <div class="shop-dashboard-header">
+                    <div class="shop-status-icon @(Model.IsApproved ? "shop-icon-approved" : "shop-icon-pending")">
+                        @if (Model.IsApproved)
+                        {
+                            <i class="fa-solid fa-circle-check"></i>
+                        }
+                        else
+                        {
+                            <i class="fa-solid fa-clock"></i>
+                        }
+                    </div>
+                    <div>
+                        <h2 class="shop-status-name">@Model.Name</h2>
+                        @if (Model.IsApproved)
+                        {
+                            <span class="td-status td-status-delivered">Підтверджено</span>
+                        }
+                        else
+                        {
+                            <span class="td-status td-status-pending">На розгляді</span>
+                        }
+                    </div>
+                </div>
+
+                @if (!string.IsNullOrEmpty(Model.Description))
+                {
+                    <p class="shop-description">@Model.Description</p>
+                }
+
+                @if (!Model.IsApproved)
+                {
+                    <div class="shop-pending-info">
+                        <i class="fa-solid fa-circle-info"></i>
+                        <span>Ваша заявка на розгляді у адміністратора. Зазвичай це займає до 24 годин.</span>
+                    </div>
+                }
+                else
+                {
+                    <div class="shop-pending-info" style="background:#dcfce7;border-color:#bbf7d0;color:#166534">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <span>Ваш магазин активний! Ви можете додавати товари.</span>
+                    </div>
+                }
+            </div>
+
+            <!-- Дії -->
+            @if (Model.IsApproved)
+            {
+                <div class="shop-dashboard-card shop-dashboard-actions">
+                    <h3 class="shop-dashboard-card-title">
+                        <i class="fa-solid fa-bolt"></i> Швидкі дії
+                    </h3>
+                    <div class="shop-action-grid">
+                        <a asp-controller="Seller" asp-action="AddProduct" class="shop-action-btn">
+                            <i class="fa-solid fa-plus"></i>
+                            <span>Додати товар</span>
+                        </a>
+                        <a asp-controller="Product" asp-action="Index" class="shop-action-btn shop-action-btn-outline">
+                            <i class="fa-solid fa-store"></i>
+                            <span>До каталогу</span>
+                        </a>
+                    </div>
+                </div>
+            }
+
+        </div>
+    }
+</div>

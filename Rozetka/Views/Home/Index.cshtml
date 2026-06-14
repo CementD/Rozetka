@@ -1,8 +1,12 @@
 ﻿@model Rozetka.ViewModels.HomeViewModel
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<Domain.User> SignInManager
 @{
     ViewData["Title"] = "ROZETKA";
     var topProducts = Model.Products?.Take(8).ToList() ?? new List<BLL.DTOs.ProductReadDto>();
     var categories = Model.Categories?.ToList() ?? new List<BLL.DTOs.CategoryReadDto>();
+    var favoriteIds = (ViewBag.FavoriteProductIds as HashSet<int>) ?? new HashSet<int>();
+    bool isLoggedIn = SignInManager.IsSignedIn(User);
 }
 
 @await Html.PartialAsync("_Header")
@@ -55,8 +59,7 @@
             <div class="products-grid">
                 @foreach (var product in topProducts)
                 {
-                    <a asp-controller="Product" asp-action="Details"
-                       asp-route-id="@product.Id" class="home-product-card">
+                    <div class="home-product-card" onclick="window.location='/Product/Details/@product.Id'">
                         <div class="card-img-wrap">
                             <img src="@(string.IsNullOrEmpty(product.ImageUrl) ? "/images/phone.jpg" : product.ImageUrl)"
                                  alt="@product.Name" onerror="this.src='/images/phone.jpg'" />
@@ -69,15 +72,33 @@
                         <p class="price">@product.Price.ToString("N0") <span class="currency">₴</span></p>
                         <div class="card-actions">
                             <form asp-controller="Cart" asp-action="AddToCart" method="post"
-                                  onclick="event.stopPropagation()">
+                                  style="flex:1" onclick="event.stopPropagation()">
                                 @Html.AntiForgeryToken()
                                 <input type="hidden" name="productId" value="@product.Id" />
                                 <button type="submit" class="buy-btn">
                                     <i class="fa-solid fa-cart-plus"></i> Купити
                                 </button>
                             </form>
+                            @if (isLoggedIn)
+                            {
+                                bool isFav = favoriteIds.Contains(product.Id);
+                                <button type="button"
+                                        class="fav-btn @(isFav ? "fav-btn-active" : "")"
+                                        title="@(isFav ? "Видалити з обраного" : "Додати в обране")"
+                                        onclick="event.stopPropagation(); toggleFav(this, @product.Id)">
+                                    <i class="@(isFav ? "fa-solid" : "fa-regular") fa-heart"></i>
+                                </button>
+                            }
+                            else
+                            {
+                                <a asp-controller="Account" asp-action="Login"
+                                   class="fav-btn" title="Увійдіть щоб додати в обране"
+                                   onclick="event.stopPropagation()">
+                                    <i class="fa-regular fa-heart"></i>
+                                </a>
+                            }
                         </div>
-                    </a>
+                    </div>
                 }
             </div>
         }

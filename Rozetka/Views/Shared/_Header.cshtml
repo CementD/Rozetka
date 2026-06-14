@@ -19,6 +19,9 @@
         <div class="header-actions">
             @if (SignInManager.IsSignedIn(User))
             {
+                <a asp-controller="Shop" asp-action="Index" class="header-icon-btn" title="Мій магазин">
+                    <i class="fa-solid fa-shop"></i>
+                </a>
                 <a asp-controller="Order" asp-action="Index" class="header-icon-btn" title="Мої замовлення">
                     <i class="fa-solid fa-box"></i>
                 </a>
@@ -35,7 +38,7 @@
                     <i class="fa-regular fa-circle-user"></i>
                 </a>
             }
-            <a href="#" class="header-icon-btn" title="Обране">
+            <a asp-controller="Favorites" asp-action="Index" class="header-icon-btn" title="Обране">
                 <i class="fa-regular fa-heart"></i>
             </a>
             <a asp-controller="Cart" asp-action="Index" class="header-icon-btn cart-btn" title="Кошик">
