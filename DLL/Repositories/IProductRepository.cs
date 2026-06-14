@@ -14,5 +14,7 @@ namespace DLL.Repositories
         Task UpdateAsync(Product product);
         Task<List<Order>> GetProductOrdersAsync(int productId);
         Task<List<Product>> GetProductsByCategoryIdAsync(int categoryId);
+
+        Task<IEnumerable<Product>> GetProductsByShopIdAsync(int shopId);
     }
 }

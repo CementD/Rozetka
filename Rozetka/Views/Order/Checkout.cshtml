@@ -63,7 +63,9 @@
                             <label asp-for="CardCvv">
                                 <i class="fa-solid fa-lock"></i> CVV
                             </label>
-                            <input asp-for="CardCvv" class="form-input" type="password"
+                            <input asp-for="CardCvv" class="form-input" type="text"
+                                   value="@Model.CardCvv"
+                                   style="-webkit-text-security: disc; -moz-text-security: disc; text-security: disc;"
                                    placeholder="•••" maxlength="3" autocomplete="cc-csc" />
                             <span asp-validation-for="CardCvv" class="text-danger"></span>
                         </div>

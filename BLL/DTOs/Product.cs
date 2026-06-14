@@ -31,5 +31,7 @@
         public string? Specifications { get; set; }
         public int CategoryId { get; set; }
         public string CategoryName { get; set; } = string.Empty;
+        public int? ShopId { get; set; }
+        public string ShopName { get; set; } = string.Empty;
     }
 }
