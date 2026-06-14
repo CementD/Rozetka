@@ -38,6 +38,7 @@ namespace Rozetka.Controllers
             var categories = await _categoryService.GetAllCategoriesAsync();
             var users = await _userService.GetAllUsersAsync();
             var orders = await _orderService.GetAllOrdersAsync();
+            var shops = await _shopService.GetAllShopsAsync();
             var pendingShops = await _shopService.GetPendingShopsAsync();
 
             var model = new AdminIndexVM
@@ -82,12 +83,15 @@ namespace Rozetka.Controllers
                     OrdersCount = u.OrdersCount
                 }).ToList(),
 
+                Shops = shops.ToList(),
+
                 PendingShops = pendingShops.ToList(),
 
                 ProductsCount = products.Count(),
                 CategoriesCount = categories.Count(),
                 OrdersCount = orders.Count(),
                 UsersCount = users.Count(),
+                ShopsCount = shops.Count(),
                 PendingCount = pendingShops.Count()
             };
 
@@ -295,6 +299,15 @@ namespace Rozetka.Controllers
         {
             var cats = await _categoryService.GetAllCategoriesAsync();
             ViewBag.Categories = new SelectList(cats, "Id", "Name", selectedId);
+        }
+
+        private async Task<IActionResult> ShopDetails(int id)
+        {
+            var shopDetails = await _shopService.GetShopDetailsByIdAsync(id);
+
+            if (shopDetails == null) return NotFound();
+
+            return View(shopDetails);
         }
     }
 }

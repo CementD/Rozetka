@@ -16,6 +16,7 @@ namespace DLL.Repositories
         {
             return await _db.Shops
                 .Include(s => s.Owner)
+                .Include(s => s.Products)
                 .FirstOrDefaultAsync(s => s.Id == id);
         }
 
@@ -46,6 +47,15 @@ namespace DLL.Repositories
         public async Task SaveChangesAsync()
         {
             await _db.SaveChangesAsync();
+        }
+
+        public async Task<IEnumerable<Shop>> GetAllShopsAsync()
+        {
+            return await _db.Shops
+                .Where(s => s.IsApproved == true)
+                .Include(s => s.Owner)
+                .Include(s => s.Products)
+                .ToListAsync();
         }
     }
 }
