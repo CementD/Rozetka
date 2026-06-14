@@ -20,7 +20,10 @@ namespace DLL.Repositories
 
         public async Task<Product?> GetByIdAsync(int id)
         {
-            return await _db.Products.Include(p => p.Category).FirstOrDefaultAsync(p => p.Id == id);
+            return await _db.Products
+                .Include(p => p.Category)
+                .Include(p => p.Shop)
+                .FirstOrDefaultAsync(p => p.Id == id);
         }
 
         public async Task AddAsync(Product product)
@@ -57,6 +60,13 @@ namespace DLL.Repositories
         {
             return _db.Products
                 .Where(p => p.CategoryId == categoryId)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Product>> GetProductsByShopIdAsync(int shopId)
+        {
+            return await _db.Products
+                .Where(p => p.ShopId == shopId)
                 .ToListAsync();
         }
     }

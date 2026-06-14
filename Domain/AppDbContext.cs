@@ -17,6 +17,8 @@ namespace Domain
         public DbSet<CartItem> CartItems { get; set; }
         public DbSet<Favorite> Favorites { get; set; }
 
+        public DbSet<Shop> Shops { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
