@@ -1,10 +1,10 @@
-﻿using System;
+﻿using BLL.DTOs;
+using Domain;
+using DLL.Repositories;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using DLL.Repositories;
-using Domain;
-using BLL.DTOs;
 
 namespace BLL
 {
@@ -24,12 +24,15 @@ namespace BLL
             {
                 Id = p.Id,
                 Name = p.Name,
-                Description = p.Description, 
+                Description = p.Description,
                 Price = p.Price,
                 ImageUrl = p.ImageUrl,
                 Specifications = p.Specifications,
                 CategoryId = p.CategoryId,
-                CategoryName = p.Category?.Name ?? "Без категорії"
+                CategoryName = p.Category?.Name ?? "Без категорії",
+
+                ShopId = p.ShopId,
+                ShopName = p.Shop?.Name ?? "Rozetka"
             });
         }
 
@@ -49,11 +52,14 @@ namespace BLL
                 ImageUrl = p.ImageUrl,
                 Specifications = p.Specifications,
                 CategoryId = p.CategoryId,
-                CategoryName = p.Category?.Name ?? "Без категорії"
+                CategoryName = p.Category?.Name ?? "Без категорії",
+
+                ShopId = p.ShopId,
+                ShopName = p.Shop?.Name ?? "Rozetka"
             };
         }
 
-        public async Task CreateProductAsync(ProductCreateDto dto)
+        public async Task CreateProductAsync(ProductCreateDto dto, int? shopId = null)
         {
             if (dto == null) throw new ArgumentNullException(nameof(dto));
             if (dto.Price < 0) throw new InvalidOperationException("Ціна не може бути негативною.");
@@ -65,7 +71,8 @@ namespace BLL
                 Price = dto.Price,
                 ImageUrl = dto.ImageUrl,
                 Specifications = dto.Specifications,
-                CategoryId = dto.CategoryId
+                CategoryId = dto.CategoryId,
+                ShopId = shopId
             };
 
             await _productRepo.AddAsync(product);
@@ -109,7 +116,28 @@ namespace BLL
                 Price = p.Price,
                 ImageUrl = p.ImageUrl,
                 Specifications = p.Specifications,
-                CategoryId = p.CategoryId
+                CategoryId = p.CategoryId,
+                ShopId = p.ShopId,
+                ShopName = p.Shop?.Name ?? "Rozetka"
+            }).ToList();
+        }
+
+        public async Task<List<ProductReadDto>> GetProductsByShopIdAsync(int shopId)
+        {
+            if (shopId <= 0) return new List<ProductReadDto>();
+
+            var products = await _productRepo.GetProductsByShopIdAsync(shopId);
+
+            return products.Select(p => new ProductReadDto
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Description = p.Description,
+                Price = p.Price,
+                ImageUrl = p.ImageUrl,
+                Specifications = p.Specifications,
+                CategoryId = p.CategoryId,
+                ShopId = p.ShopId
             }).ToList();
         }
 

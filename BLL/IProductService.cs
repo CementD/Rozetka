@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using BLL.DTOs; // Подключаем наши DTO
+using BLL.DTOs;
 using Domain;
 
 namespace BLL
@@ -11,8 +11,7 @@ namespace BLL
 
         Task<ProductReadDto?> GetProductByIdAsync(int id);
 
-        Task CreateProductAsync(ProductCreateDto dto);
-
+        Task CreateProductAsync(ProductCreateDto dto, int? shopId = null);
         Task UpdateProductAsync(ProductUpdateDto dto);
 
         Task DeleteProductAsync(int id);
