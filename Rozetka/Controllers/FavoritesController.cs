@@ -5,7 +5,7 @@ using System.Security.Claims;
 
 namespace Rozetka.Controllers
 {
-    [Authorize] 
+    [Authorize]
     public class FavoritesController : Controller
     {
         private readonly IFavoriteService _favoriteService;
@@ -22,7 +22,6 @@ namespace Rozetka.Controllers
             if (string.IsNullOrEmpty(userId)) return Challenge();
 
             var favorites = await _favoriteService.GetUserFavoritesAsync(userId);
-
             return View(favorites);
         }
 
@@ -30,14 +29,30 @@ namespace Rozetka.Controllers
         public async Task<IActionResult> Toggle(int id)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userId))
-            {
-                return Json(new { success = false, message = "Авторизуйтесь" });
-            }
+            if (string.IsNullOrEmpty(userId)) return Challenge();
 
             await _favoriteService.ToggleFavoriteAsync(userId, id);
 
+            var referer = Request.Headers["Referer"].ToString();
+            if (!string.IsNullOrEmpty(referer))
+                return Redirect(referer);
+
             return RedirectToAction("Index", "Product");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ToggleJson(int id)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+                return Json(new { success = false });
+
+            await _favoriteService.ToggleFavoriteAsync(userId, id);
+
+            var favs = await _favoriteService.GetUserFavoritesAsync(userId);
+            bool isFav = favs.Any(f => f.ProductId == id);
+
+            return Json(new { success = true, isFavorite = isFav });
         }
     }
 }

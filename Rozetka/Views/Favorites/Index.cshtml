@@ -1,0 +1,74 @@
+@model IEnumerable<Domain.Favorite>
+@{
+    ViewData["Title"] = "Обране";
+    var items = Model?.ToList() ?? new List<Domain.Favorite>();
+}
+
+@await Html.PartialAsync("_Header")
+
+<div class="page-layout">
+    <div class="page-header">
+        <div>
+            <h1><i class="fa-solid fa-heart"></i> Обране</h1>
+            <p class="page-sub">@items.Count товарів у списку бажань</p>
+        </div>
+        <a asp-controller="Product" asp-action="Index" class="cancel-btn">
+            <i class="fa-solid fa-store"></i> До каталогу
+        </a>
+    </div>
+
+    @if (!items.Any())
+    {
+        <div class="empty-state">
+            <i class="fa-regular fa-heart empty-icon"></i>
+            <h2>Список бажань порожній</h2>
+            <p>Додавайте товари в обране щоб не загубити їх</p>
+            <a asp-controller="Product" asp-action="Index"
+               class="buy-btn" style="display:inline-flex;padding:14px 28px">
+                <i class="fa-solid fa-store"></i>&nbsp; До каталогу
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="product-grid">
+            @foreach (var fav in items)
+            {
+                var product = fav.Product;
+                if (product == null) continue;
+
+                <a asp-controller="Product" asp-action="Details"
+                   asp-route-id="@product.Id" class="product-card">
+                    <div class="card-img-wrap">
+                        <img src="@(string.IsNullOrEmpty(product.ImageUrl) ? "/images/phone.jpg" : product.ImageUrl)"
+                             alt="@product.Name" onerror="this.src='/images/phone.jpg'" />
+                    </div>
+                    <div class="card-body">
+                        <h3>@product.Name</h3>
+                        @if (!string.IsNullOrEmpty(product.Description))
+                        {
+                            <p class="desc">@(product.Description.Length > 70 ? product.Description[..70] + "…" : product.Description)</p>
+                        }
+                        <div class="price">@product.Price.ToString("N0") <span class="currency">₴</span></div>
+                        <div class="card-actions" onclick="event.stopPropagation()">
+                            <form asp-controller="Cart" asp-action="AddToCart" method="post" style="flex:1">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="productId" value="@product.Id" />
+                                <button type="submit" class="buy-btn">
+                                    <i class="fa-solid fa-cart-plus"></i> Купити
+                                </button>
+                            </form>
+                            <form asp-controller="Favorites" asp-action="Toggle" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@product.Id" />
+                                <button type="submit" class="fav-btn fav-btn-active" title="Видалити з обраного">
+                                    <i class="fa-solid fa-heart"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </a>
+            }
+        </div>
+    }
+</div>

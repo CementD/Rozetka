@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Rozetka.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    @Html.AntiForgeryToken()
 </head>
 <body>
     <main role="main">
@@ -15,5 +16,45 @@
     </main>
 
     @await RenderSectionAsync("Scripts", required: false)
+
+    <script>
+        async function toggleFav(btn, productId) {
+            const token = document.querySelector('meta[name="csrf-token"]')?.content
+                       || document.querySelector('input[name="__RequestVerificationToken"]')?.value
+                       || '';
+
+            btn.disabled = true;
+
+            try {
+                const resp = await fetch('/Favorites/ToggleJson', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'RequestVerificationToken': token
+                    },
+                    body: `id=${productId}&__RequestVerificationToken=${encodeURIComponent(token)}`
+                });
+
+                const data = await resp.json();
+
+                if (data.success) {
+                    const icon = btn.querySelector('i');
+                    if (data.isFavorite) {
+                        btn.classList.add('fav-btn-active');
+                        icon.className = 'fa-solid fa-heart';
+                        btn.title = 'Видалити з обраного';
+                    } else {
+                        btn.classList.remove('fav-btn-active');
+                        icon.className = 'fa-regular fa-heart';
+                        btn.title = 'Додати в обране';
+                    }
+                }
+            } catch (e) {
+                console.error('Fav toggle error:', e);
+            } finally {
+                btn.disabled = false;
+            }
+        }
+    </script>
 </body>
 </html>
