@@ -22,6 +22,11 @@ namespace Rozetka.Data
                 await roleManager.CreateAsync(new IdentityRole("Customer"));
             }
 
+            if (!await roleManager.RoleExistsAsync("Seller"))
+            {
+                await roleManager.CreateAsync(new IdentityRole("Seller"));
+            }
+
             string adminEmail = "admin@rozetka.com";
             if (await userManager.FindByEmailAsync(adminEmail) == null)
             {
