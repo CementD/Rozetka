@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using BLL;
 using Rozetka.Models;
 using Rozetka.ViewModels;
+using BLL.DTOs;
 
 namespace Rozetka.Controllers
 {
@@ -36,7 +37,7 @@ namespace Rozetka.Controllers
                 Categories = categoriesDto
             };
 
-            vm.Stores = new List<string>();
+            vm.Stores = new List<ShopDto>();
 
             return View(vm);
         }

@@ -10,5 +10,20 @@
 
         public string OwnerEmail { get; set; } = string.Empty;
         public string OwnerFullName { get; set; } = string.Empty;
+        public int ProductsCount { get; set; }
+    }
+
+    public class ShopDetailsDto
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string? Description { get; set; }
+        public bool IsApproved { get; set; }
+
+        public string OwnerId { get; set; } = string.Empty;
+        public string OwnerEmail { get; set; } = string.Empty;
+        public string OwnerFullName { get; set; } = string.Empty;
+
+        public List<ProductReadDto> Products { get; set; } = new List<ProductReadDto>();
     }
 }

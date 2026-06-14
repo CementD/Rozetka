@@ -82,5 +82,55 @@ namespace BLL
 
             return true;
         }
+
+        public async Task<IEnumerable<ShopDto>> GetAllShopsAsync()
+        {
+            var shops = await _shopRepository.GetAllShopsAsync();
+
+            return shops.Select(s => new ShopDto
+            {
+                Id = s.Id,
+                Name = s.Name,
+                Description = s.Description,
+                OwnerId = s.OwnerId,
+                IsApproved = s.IsApproved,
+                OwnerEmail = s.Owner?.Email ?? "???",
+                OwnerFullName = s.Owner != null ? $"{s.Owner.FirstName} {s.Owner.LastName}" : "Невідомо",
+                ProductsCount = s.Products?.Count ?? 0
+            });
+        }
+
+        public async Task<ShopDetailsDto?> GetShopDetailsByIdAsync(int shopId)
+        {
+            var shop = await _shopRepository.GetByIdAsync(shopId);
+            if (shop == null) return null;
+
+            var detailsDto = new ShopDetailsDto
+            {
+                Id = shop.Id,
+                Name = shop.Name,
+                Description = shop.Description,
+                IsApproved = shop.IsApproved,
+                OwnerId = shop.OwnerId,
+                OwnerEmail = shop.Owner?.Email ?? "???",
+                OwnerFullName = shop.Owner != null ? $"{shop.Owner.FirstName} {shop.Owner.LastName}" : "Невідомо"
+            };
+
+            if (shop.Products != null && shop.Products.Any())
+            {
+                detailsDto.Products = shop.Products.Select(p => new ProductReadDto
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    Description = p.Description,
+                    Price = p.Price,
+                    ImageUrl = p.ImageUrl,
+                    Specifications = p.Specifications,
+                    CategoryId = p.CategoryId
+                }).ToList();
+            }
+
+            return detailsDto;
+        }
     }
 }

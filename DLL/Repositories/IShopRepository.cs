@@ -10,5 +10,6 @@ namespace DLL.Repositories
         Task AddAsync(Shop shop);
         void Update(Shop shop);
         Task SaveChangesAsync();
+        Task<IEnumerable<Shop>> GetAllShopsAsync();
     }
 }

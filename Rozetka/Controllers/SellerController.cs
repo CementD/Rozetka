@@ -20,6 +20,8 @@ namespace Rozetka.Controllers
             _categoryService = categoryService;
         }
 
+
+
         public async Task<IActionResult> AddProduct()
         {
             var categories = await _categoryService.GetAllCategoriesAsync();

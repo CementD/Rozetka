@@ -7,6 +7,6 @@ namespace Rozetka.ViewModels
     {
         public IEnumerable<ProductReadDto> Products { get; set; }
         public IEnumerable<CategoryReadDto> Categories { get; set; }
-        public IEnumerable<string> Stores { get; set; }
+        public IEnumerable<ShopDto> Stores { get; set; }
     }
 }
